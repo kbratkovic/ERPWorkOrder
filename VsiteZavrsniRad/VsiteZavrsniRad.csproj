@@ -20,4 +20,8 @@
     <PackageReference Include="Radzen.Blazor" Version="3.18.16" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Data\" />
+  </ItemGroup>
+
 </Project>

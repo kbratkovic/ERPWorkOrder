@@ -13,7 +13,7 @@ public class WorkOrderModel
 
     public int WorkOrderNumber { get; set; }
 
-    public DateOnly Date { get; set; }
+    public DateTime Date { get; set; }
 
     public ClientModel Client { get; set; } = new ClientModel();
 

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
+using Radzen;
 using VsiteZavrsniRad.Data;
 using VsiteZavrsniRad.Database;
 
@@ -15,6 +16,12 @@ builder.Services.AddDbContext<ZavrsniRadDbContext>(opts =>
 {
     opts.UseSqlServer(builder.Configuration["ConnectionStrings:DBConnection"]);
 });
+
+// Radzen
+builder.Services.AddScoped<DialogService>();
+builder.Services.AddScoped<NotificationService>();
+builder.Services.AddScoped<TooltipService>();
+builder.Services.AddScoped<ContextMenuService>();
 
 var app = builder.Build();
 

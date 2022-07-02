@@ -1,0 +1,84 @@
+﻿@page "/client/create"
+@page "/client/edit/{id:int}"
+
+
+@inject ClientModel Client;
+@inject NavigationManager NavigationManager;
+
+@inherits OwningComponentBase<IClientRepository>
+
+
+<PageTitle>@pageTitle</PageTitle>
+
+<RadzenCard>
+    <EditForm Model="@Client" OnValidSubmit="SaveClient" class="w-100">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group row">
+            <label>Ime tvrtke</label>
+            <RadzenTextBox @bind-Value="Client.CompanyName" class="mb-4" />
+        </div>
+
+        <div class="form-group row">
+            <label>OIB</label>
+            <RadzenTextBox @bind-Value="Client.TaxNumber" class="mb-4" />
+        </div>
+
+        <div class="form-group row">
+            <label>Grad</label>
+            <RadzenTextBox @bind-Value="Client.City" class="mb-4" />
+        </div>
+
+        <div class="form-group row">
+            <label>Adresa</label>
+            <RadzenTextBox @bind-Value="Client.Address" class="mb-4" />
+        </div>
+
+        <div class="form-group row">
+            <label>Kontakt osoba</label>
+            <RadzenTextBox @bind-Value="Client.ContactPerson" class="mb-4" />
+        </div>
+
+        <div class="form-group row">
+            <label>Kontakt telefon</label>
+            <RadzenTextBox @bind-Value="Client.PhoneNumber" class="mb-4" />
+        </div>
+
+        <button type="submit" class="btn btn-primary w-50">Spremi</button>
+    </EditForm>
+</RadzenCard>
+
+@code {
+    string pageTitle = "";
+    public IClientRepository Repository => Service;
+
+    [Parameter]
+    public int Id { get; set; } = 0;
+
+
+    protected override void OnParametersSet()
+    {
+        Client = Repository.Clients.FirstOrDefault(c => c.Id == Id) ?? new();
+
+        pageTitle = (Id == 0) ? "Novi klijent" : "Uredi klijenta";
+
+    }
+
+
+    private void SaveClient()
+    {
+        if (Id == 0)
+        {
+            Repository.CreateClient(Client);
+        }
+        else
+        {
+            Repository.SaveClient(Client);
+        }
+        NavigationManager.NavigateTo("clients");
+    }
+
+
+
+}

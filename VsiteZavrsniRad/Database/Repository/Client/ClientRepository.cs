@@ -1,6 +1,6 @@
 ﻿using VsiteZavrsniRad.Models;
 
-namespace VsiteZavrsniRad.Database.Repository;
+namespace VsiteZavrsniRad.Database.Repository.Client;
 
 public class ClientRepository : IClientRepository
 {
@@ -17,7 +17,8 @@ public class ClientRepository : IClientRepository
 
     public void CreateClient(ClientModel client)
     {
-        throw new NotImplementedException();
+        _dbContext.Add(client);
+        _dbContext.SaveChanges();
     }
 
     public void DeleteClient(ClientModel client)
@@ -27,6 +28,7 @@ public class ClientRepository : IClientRepository
 
     public void SaveClient(ClientModel client)
     {
-        throw new NotImplementedException();
+        _dbContext.SaveChanges();
+
     }
 }

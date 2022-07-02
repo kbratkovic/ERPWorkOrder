@@ -1,0 +1,84 @@
+﻿@page "/clients"
+
+@*@inject ClientModel Client;*@
+@inject NavigationManager NavigationManager
+
+@inherits OwningComponentBase<IClientRepository>
+
+
+<PageTitle>Klijenti</PageTitle>
+
+<NavLink class="btn btn-primary mb-4" href="@CreateNewClient">Novi klijent</NavLink>
+
+@if (ClientData?.Count() > 0)
+{
+    foreach (var client in ClientData)
+    {
+        <RadzenCard class="mb-2">
+                <div class="container">
+                    <div class="row">
+                        <h3 class="col-lg-3">
+                            @(client.CompanyName)
+                        </h3>
+                        <div class="col-lg-7">
+                            <div class="row d-flex">
+                                <div class="col-md-6 col-lg-2 mb-2">
+                                    <b><p class="mb-sm-2 mb-lg-0">@(client.TaxNumber)</p></b>
+                                </div>
+                                <div class="col-md-6 col-lg-5 mb-2">
+                                    <b><label class="mb-0">Adresa</label></b>
+                                    <p class="mb-0 mb-lg-0">@(client.City)</p>
+                                    <p class="mb-sm-2 mb-lg-0">@(client.Address)</p>
+                                </div>
+                                @*<div class="col-md-6 col-lg-2 mb-2">
+                                    <label class="mb-0">Adresa</label>
+                                    <p class="mb-sm-2 mb-lg-0">@(client.Address)</p>
+                                </div>*@
+                                <div class="col-md-6 col-lg-5 mb-2">
+                                    <b><label class="mb-0">Kontakt</label></b>
+                                    <p class="mb-0 mb-lg-0">@(client.ContactPerson)</p>
+                                    <p class="mb-sm-2 mb-lg-0">@(client.PhoneNumber)</p>
+
+                                </div>
+                                @*<div class="col-md-6 col-lg-5 mb-2">
+                                    <label class="mb-0">Telefon</label>
+                                    <p class="mb-sm-2 mb-lg-0">@(client.PhoneNumber)</p>
+                                </div>*@
+                            </div>
+                        </div>
+                        <div class="col-lg-2 p-1">
+                            @*<button @onclick="EditClient" class="btn btn-warning w-50">Uredi</button>*@
+                            <NavLink class="btn btn-warning" href="@EdiContact(client.Id)">Uredi</NavLink>
+                        </div>
+                    </div>
+                </div>
+    </RadzenCard>
+    }
+}
+
+
+
+@code {
+    private IClientRepository Repository => Service;
+
+    public ClientModel? Client { get; set; }
+
+    public IEnumerable<ClientModel> ClientData { get; set; } = Enumerable.Empty<ClientModel>();
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        await UpdateData();
+    }
+
+    
+    public async Task UpdateData()
+    {
+        ClientData = await Repository.Clients.ToListAsync();
+    }
+
+
+    public string CreateNewClient => $"/client/create";
+
+    public string EdiContact(int id) => $"/client/edit/{id}";
+}

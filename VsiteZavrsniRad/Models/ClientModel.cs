@@ -11,19 +11,19 @@ public class ClientModel
 {
     public int Id { get; set; }
 
-    [Required]
+    [Required(ErrorMessage = "Ime tvrtke je obavezno")]
     [MaxLength(100)]
     public string CompanyName { get; set; } = String.Empty;
 
-    [Required]
+    [Required(ErrorMessage = "OIB je obavezan")]
     [MaxLength(11)]
     public string TaxNumber { get; set; } = String.Empty;
 
-    [Required]
+    [Required(ErrorMessage = "Grad je obavezan")]
     [MaxLength(50)]
     public string City { get; set; } = String.Empty;
 
-    [Required]
+    [Required(ErrorMessage = "Adresa je obavezna")]
     [MaxLength(200)]
     public string Address { get; set; } = String.Empty;
 

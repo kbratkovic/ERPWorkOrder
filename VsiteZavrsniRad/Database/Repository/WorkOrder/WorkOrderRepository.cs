@@ -1,6 +1,6 @@
 ﻿using VsiteZavrsniRad.Models;
 
-namespace VsiteZavrsniRad.Database.Repository;
+namespace VsiteZavrsniRad.Database.Repository.WorkOrder;
 
 public class WorkOrderRepository : IWorkOrderRepository
 {

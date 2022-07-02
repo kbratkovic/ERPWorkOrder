@@ -1,6 +1,6 @@
 ﻿using VsiteZavrsniRad.Models;
 
-namespace VsiteZavrsniRad.Database.Repository;
+namespace VsiteZavrsniRad.Database.Repository.Client;
 
 public interface IClientRepository
 {

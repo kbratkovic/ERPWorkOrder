@@ -45,8 +45,13 @@
             <RadzenTextBox @bind-Value="Client.PhoneNumber" class="mb-4" />
         </div>
 
-        <button type="submit" class="btn btn-primary w-50">Spremi</button>
+        <RadzenButton type="submit" Text="Spremi" ButtonStyle="ButtonStyle.Secondary" />
+        
+        <NavLink href="@BackToClients">
+            <RadzenButton Text="Odustani" />
+        </NavLink>
     </EditForm>
+
 </RadzenCard>
 
 @code {
@@ -80,5 +85,11 @@
     }
 
 
+    public string BackToClients => $"/clients";
+
+    //private void BackToClients()
+    //{
+    //    NavigationManager.NavigateTo("/clients");
+    //}
 
 }

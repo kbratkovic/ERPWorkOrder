@@ -1,0 +1,84 @@
+﻿@page "/sparePart/create"
+@page "/sparePart/edit/{id:int}"
+
+
+@inject SparePartModel SparePart;
+@inject NavigationManager NavigationManager;
+
+@inherits OwningComponentBase<ISparePartRepository>
+
+
+<PageTitle>@pageTitle</PageTitle>
+
+<RadzenCard>
+    <EditForm Model="@SparePart" OnValidSubmit="SaveSparePart" class="w-100">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group row">
+            <label>Šifra</label>
+            <RadzenTextBox @bind-Value="SparePart.Code" class="mb-4" />
+        </div>
+
+        <div class="form-group row">
+            <label>Opis</label>
+            <RadzenTextBox @bind-Value="SparePart.Description" class="mb-4" />
+        </div>
+
+        <div class="form-group row">
+            <label>Količina</label>
+            <InputNumber @bind-Value="SparePart.Quantity" class="mb-4" />
+        </div>
+
+        <div class="form-group row">
+            <label>Cijena VPC</label>
+            <InputNumber @bind-Value="SparePart.PriceWithoutVAT" class="mb-4" />
+        </div>
+
+        <RadzenButton type="submit" Text="Spremi" ButtonStyle="ButtonStyle.Secondary" />
+        
+        <NavLink href="@BackToSpareParts">
+            <RadzenButton Text="Odustani" />
+        </NavLink>
+    </EditForm>
+</RadzenCard>
+
+@code {
+    string pageTitle = "";
+    public ISparePartRepository Repository => Service;
+
+    [Parameter]
+    public int Id { get; set; } = 0;
+
+
+    protected override void OnParametersSet()
+    {
+        SparePart = Repository.SpareParts.FirstOrDefault(sp => sp.Id == Id);
+
+        pageTitle = (Id == 0) ? "Novi rezervni dio" : "Uredi rezervni dio";
+
+    }
+
+
+    private void SaveSparePart()
+    {
+        if (Id == 0)
+        {
+            Repository.CreateSparePart(SparePart);
+        }
+        else
+        {
+            Repository.SaveSparePart(SparePart);
+        }
+        NavigationManager.NavigateTo("spareParts");
+    }
+
+
+    public string BackToSpareParts => $"/spareParts";
+
+    //private void BackToClients()
+    //{
+    //    NavigationManager.NavigateTo("/clients");
+    //}
+
+}

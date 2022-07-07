@@ -35,24 +35,15 @@
                                     <b><label class="mb-0">Količina</label></b>
                                     <p class="mb-sm-2 mb-lg-0">@(sparePart.Quantity)</p>
                                 </div>
-                                @*<div class="col-md-6 col-lg-2 mb-2">
-                            <label class="mb-0">Adresa</label>
-                            <p class="mb-sm-2 mb-lg-0">@(client.Address)</p>
-                            </div>*@
                                 <div class="col-md-6 col-lg-5 mb-2">
                                     <b><label class="mb-0">Cijena</label></b>
-                                    <p class="mb-0 mb-lg-0">@(sparePart.PriceWithoutVAT)</p>
-                                    <p class="mb-sm-2 mb-lg-0">@(sparePart.PriceWithVAT)</p>
+                                    <p class="mb-0 mb-lg-0">@(sparePart.PriceWithoutVAT) kn (vpc)</p>
+                                    <b><p class="mb-sm-2 mb-lg-0">@(sparePart.PriceWithVAT) kn (mpc)</p></b>
 
                                 </div>
-                                @*<div class="col-md-6 col-lg-5 mb-2">
-                            <label class="mb-0">Telefon</label>
-                            <p class="mb-sm-2 mb-lg-0">@(client.PhoneNumber)</p>
-                            </div>*@
                             </div>
                         </div>
                         <div class="col-lg-2 p-1">
-                            @*<button @onclick="EditClient" class="btn btn-warning w-50">Uredi</button>*@
                             <NavLink class="btn btn-warning" href="@EditSparePart(sparePart.Id)">Uredi</NavLink>
                         </div>
                     </div>
@@ -60,6 +51,9 @@
             </RadzenCard>
         </Template>
     </RadzenDataList>
+} else
+{
+    <p>Učitavanje podataka...</p>
 }
 
 

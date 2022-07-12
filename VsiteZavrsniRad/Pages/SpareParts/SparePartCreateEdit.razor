@@ -53,7 +53,7 @@
 
     protected override void OnParametersSet()
     {
-        SparePart = Repository.SpareParts.FirstOrDefault(sp => sp.Id == Id);
+        SparePart = Repository.SpareParts.FirstOrDefault(sp => sp.Id == Id) ?? new();
 
         pageTitle = (Id == 0) ? "Novi rezervni dio" : "Uredi rezervni dio";
 
@@ -78,7 +78,7 @@
 
     //private void BackToClients()
     //{
-    //    NavigationManager.NavigateTo("/clients");
+    //    NavigationManager.NavigateTo("/spareParts");
     //}
 
 }

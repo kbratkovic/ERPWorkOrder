@@ -1,0 +1,148 @@
+﻿@page "/"
+@page "/workOrders"
+
+@inject ClientModel Client;
+@inject DialogService DialogService
+@inject NavigationManager NavigationManager
+
+@inherits OwningComponentBase<IClientRepository>
+
+
+<PageTitle>Radni nalozi</PageTitle>
+
+<NavLink href="@CreateNewWorkOrder" class="btn mb-4">
+    <RadzenButton Text="Novi radni nalog" ButtonStyle="ButtonStyle.Secondary" />
+</NavLink>
+
+
+@*<RadzenButton Text="Open dialog" ButtonStyle="ButtonStyle.Secondary" Click=@OpenOrder />*@
+
+@if (ClientData?.Count() > 0)
+{
+    <RadzenDataList WrapItems="true" AllowPaging="true" Data="@ClientData" PageSize="5" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true">
+        <Template Context="client">
+            <RadzenCard class="mb-2">
+                <div class="container">
+                    <div class="row">
+                        <h3 class="col-lg-3">
+                            @(client.CompanyName)
+                        </h3>
+                        <div class="col-lg-7">
+                            <div class="row d-flex">
+                                <div class="col-md-6 col-lg-2 mb-2">
+                                    <b><p class="mb-sm-2 mb-lg-0">@(client.TaxNumber)</p></b>
+                                </div>
+                                <div class="col-md-6 col-lg-5 mb-2">
+                                    <b><label class="mb-0">Adresa</label></b>
+                                    <p class="mb-0 mb-lg-0">@(client.City)</p>
+                                    <p class="mb-sm-2 mb-lg-0">@(client.Address)</p>
+                                </div>
+                                @*<div class="col-md-6 col-lg-2 mb-2">
+                            <label class="mb-0">Adresa</label>
+                            <p class="mb-sm-2 mb-lg-0">@(client.Address)</p>
+                            </div>*@
+                                <div class="col-md-6 col-lg-5 mb-2">
+                                    <b><label class="mb-0">Kontakt</label></b>
+                                    <p class="mb-0 mb-lg-0">@(client.ContactPerson)</p>
+                                    <p class="mb-sm-2 mb-lg-0">@(client.PhoneNumber)</p>
+
+                                </div>
+                                @*<div class="col-md-6 col-lg-5 mb-2">
+                            <label class="mb-0">Telefon</label>
+                            <p class="mb-sm-2 mb-lg-0">@(client.PhoneNumber)</p>
+                            </div>*@
+                            </div>
+                        </div>
+                        <div class="col-lg-2 p-1">
+                            @*<button @onclick="EditClient" class="btn btn-warning w-50">Uredi</button>*@
+                            <NavLink class="btn btn-warning" href="@EditWorkOrder(client.Id)">Uredi</NavLink>
+                        </div>
+                    </div>
+                </div>
+            </RadzenCard>
+        </Template>
+    </RadzenDataList>
+}
+
+
+
+@code {
+    private IClientRepository Repository => Service;
+
+    // promjeniti u IEnumerable i izbrisati dummy podatke
+    public List<ClientModel> ClientData { get; set; } = new List<ClientModel>()
+    {
+        new ClientModel
+        {
+            Id = 1,
+            CompanyName = "Makita",
+            TaxNumber = "6546546",
+            City = "Zagreb",
+            Address = "Zagrebacka 12",
+            ContactPerson = "Ivan Horvat",
+            PhoneNumber = "01 2564 221"
+        },
+
+        new ClientModel
+        {
+            Id = 2,
+            CompanyName = "Bosch",
+            TaxNumber = "6546546",
+            City = "Zagreb",
+            Address = "Zagrebacka 12",
+            ContactPerson = "Ivan Horvat",
+            PhoneNumber = "01 2564 221"
+        },
+
+        new ClientModel
+        {
+            Id = 3,
+            CompanyName = "Dewalt",
+            TaxNumber = "6546546",
+            City = "Zagreb",
+            Address = "Zagrebacka 12",
+            ContactPerson = "Ivan Horvat",
+            PhoneNumber = "01 2564 221"
+        },
+
+        new ClientModel
+        {
+            Id = 4,
+            CompanyName = "HILTI",
+            TaxNumber = "6546546",
+            City = "Zagreb",
+            Address = "Zagrebacka 12",
+            ContactPerson = "Ivan Horvat",
+            PhoneNumber = "01 2564 221"
+        }
+    };
+
+
+    //protected async override Task OnInitializedAsync()
+    //{
+    //    await UpdateData();
+    //}
+
+
+    //public async Task UpdateData()
+    //{
+    //    ClientData = await Repository.Clients.ToListAsync();
+    //}
+
+
+    public string CreateNewWorkOrder => $"/workOrder/create";
+
+    public string EditWorkOrder(int id) => $"/workOrder/edit/{id}";
+
+
+
+    // RadzenDialog Demo
+    //public int orderID = 12345;
+
+    //public async Task OpenOrder()
+    //{
+    //    await DialogService.OpenAsync<Clients>($"Order {orderID}", null, null);
+    //}
+
+
+}

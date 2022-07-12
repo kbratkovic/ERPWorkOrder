@@ -16,62 +16,51 @@
 
 @*<RadzenButton Text="Open dialog" ButtonStyle="ButtonStyle.Secondary" Click=@OpenOrder />*@
 
-@if (SparePartsData?.Count() > 0)
-{
-    <RadzenDataList WrapItems="true" AllowPaging="true" Data="@SparePartsData" PageSize="5" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true">
-        <Template Context="sparePart">
-            <RadzenCard class="mb-2">
-                <div class="container">
-                    <div class="row">
-                        <h3 class="col-lg-3">
-                            @(sparePart.Code)
-                        </h3>
-                        <div class="col-lg-7">
-                            <div class="row d-flex">
-                                <div class="col-md-6 col-lg-2 mb-2">
-                                    <b><p class="mb-sm-2 mb-lg-0">@(sparePart.Description)</p></b>
-                                </div>
-                                <div class="col-md-6 col-lg-5 mb-2">
-                                    <b><label class="mb-0">Količina</label></b>
-                                    <p class="mb-sm-2 mb-lg-0">@(sparePart.Quantity)</p>
-                                </div>
-                                @*<div class="col-md-6 col-lg-2 mb-2">
-                            <label class="mb-0">Adresa</label>
-                            <p class="mb-sm-2 mb-lg-0">@(client.Address)</p>
-                            </div>*@
-                                <div class="col-md-6 col-lg-5 mb-2">
-                                    <b><label class="mb-0">Cijena</label></b>
-                                    <p class="mb-0 mb-lg-0">@(sparePart.PriceWithoutVAT)</p>
-                                    <p class="mb-sm-2 mb-lg-0">@(sparePart.PriceWithVAT)</p>
 
-                                </div>
-                                @*<div class="col-md-6 col-lg-5 mb-2">
-                            <label class="mb-0">Telefon</label>
-                            <p class="mb-sm-2 mb-lg-0">@(client.PhoneNumber)</p>
-                            </div>*@
-                            </div>
-                        </div>
-                        <div class="col-lg-2 p-1">
-                            @*<button @onclick="EditClient" class="btn btn-warning w-50">Uredi</button>*@
-                            <NavLink class="btn btn-warning" href="@EditSparePart(sparePart.Id)">Uredi</NavLink>
-                        </div>
-                    </div>
-                </div>
-            </RadzenCard>
-        </Template>
-    </RadzenDataList>
-}
+<table class="table table-striped table-bordered table-sm">
+    <thead>
+        <tr>
+            <th scope="col">Rb.</th>
+            <th scope="col">Šifra</th>
+            <th scope="col">Opis</th>
+            <th scope="col">Kličina</th>
+            <th scope="col">Cijena vpc</th>
+            <th scope="col">Cijena mpc</th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (SparePartsData?.Count() > 0)
+        {
+            foreach (var sparePart in SparePartsData)
+            {
+                orderNumber++;
+                <tr>
+                    <td>@orderNumber</td>
+                    <td>@sparePart.Code</td>
+                    <td>@sparePart.Description</td>
+                    <td>@sparePart.Quantity</td>
+                    <td>@sparePart.PriceWithoutVAT</td>
+                    <td>@CalculatePriceWithVAT(sparePart.PriceWithoutVAT)</td>
+                    <td class="text-center"><NavLink class="btn btn-warning" href="@EditSparePart(sparePart.Id)">Uredi</NavLink></td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
 
 
 
 @code {
-    private ISparePartRepository Repository => Service;
 
+    private int orderNumber;
+    private ISparePartRepository Repository => Service;
     public IEnumerable<SparePartModel> SparePartsData { get; set; } = Enumerable.Empty<SparePartModel>();
 
-
+    
     protected async override Task OnInitializedAsync()
     {
+        orderNumber = 0;
         await UpdateData();
     }
 
@@ -86,6 +75,13 @@
 
     public string EditSparePart(int id) => $"/sparePart/edit/{id}";
 
+
+    private string CalculatePriceWithVAT(decimal price)
+    {
+        decimal tax = VAT.VATvalue;
+        decimal priceWithVAT = (price * tax) + price;
+        return priceWithVAT.ToString("0.00");
+    }
 
 
     // RadzenDialog Demo

@@ -2,5 +2,5 @@
 
 static public class VAT
 {
-    static public double VATvalue { get; } = 0.25;
+    static public decimal VATvalue { get; } = 0.25M;
 }

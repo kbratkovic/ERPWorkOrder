@@ -1,0 +1,94 @@
+﻿@page "/workOrder/create"
+@page "/workOrder/edit/{id:int}"
+
+
+@inject WorkOrderModel WorkOrder;
+@inject NavigationManager NavigationManager;
+
+@inherits OwningComponentBase<IWorkOrderRepository>
+
+
+<PageTitle>@pageTitle</PageTitle>
+
+<RadzenCard>
+@*    <EditForm Model="@WorkOrder" OnValidSubmit="SaveWorkOrder" class="w-100">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group row">
+            <label>Ime tvrtke</label>
+            <RadzenTextBox @bind-Value="Client.CompanyName" class="mb-4" />
+        </div>
+
+        <div class="form-group row">
+            <label>OIB</label>
+            <RadzenTextBox @bind-Value="Client.TaxNumber" class="mb-4" />
+        </div>
+
+        <div class="form-group row">
+            <label>Grad</label>
+            <RadzenTextBox @bind-Value="Client.City" class="mb-4" />
+        </div>
+
+        <div class="form-group row">
+            <label>Adresa</label>
+            <RadzenTextBox @bind-Value="Client.Address" class="mb-4" />
+        </div>
+
+        <div class="form-group row">
+            <label>Kontakt osoba</label>
+            <RadzenTextBox @bind-Value="Client.ContactPerson" class="mb-4" />
+        </div>
+
+        <div class="form-group row">
+            <label>Kontakt telefon</label>
+            <RadzenTextBox @bind-Value="Client.PhoneNumber" class="mb-4" />
+        </div>
+
+        <RadzenButton type="submit" Text="Spremi" ButtonStyle="ButtonStyle.Secondary" />
+        
+        <NavLink href="@BackToClients">
+            <RadzenButton Text="Odustani" />
+        </NavLink>
+    </EditForm>*@
+</RadzenCard>
+
+@code {
+    string pageTitle = "";
+    public IWorkOrderRepository Repository => Service;
+
+    [Parameter]
+    public int Id { get; set; } = 0;
+
+
+    protected override void OnParametersSet()
+    {
+        //WorkOrder = Repository.WorkOrders.FirstOrDefault(c => c.Id == Id) ?? new();
+
+        pageTitle = (Id == 0) ? "Novi radni nalog" : "Uredi radni nalog";
+
+    }
+
+
+    private void SaveWorkOrder()
+    {
+        if (Id == 0)
+        {
+            Repository.CreateWorkOrder(WorkOrder);
+        }
+        else
+        {
+            Repository.SaveWorkOrder(WorkOrder);
+        }
+        NavigationManager.NavigateTo("workOrder");
+    }
+
+
+    public string BackToWorkOrders => $"/workOrders";
+
+    //private void BackToClients()
+    //{
+    //    NavigationManager.NavigateTo("/clients");
+    //}
+
+}

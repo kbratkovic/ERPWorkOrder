@@ -17,16 +17,13 @@ public class SparePartRepository : ISparePartRepository
 
     public void CreateSparePart(SparePartModel sparePart)
     {
-        throw new NotImplementedException();
+        _dbContext.Add(sparePart);
+        _dbContext.SaveChanges();
     }
 
-    public void DeleteSparePart(SparePartModel sparePart)
-    {
-        throw new NotImplementedException();
-    }
 
     public void SaveSparePart(SparePartModel sparePart)
     {
-        throw new NotImplementedException();
+        _dbContext.SaveChanges();
     }
 }

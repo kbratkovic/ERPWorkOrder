@@ -14,7 +14,7 @@
 </NavLink>
 
 
-<RadzenButton Text="Open dialog" ButtonStyle="ButtonStyle.Secondary" Click=@OpenOrder />
+@*<RadzenButton Text="Open dialog" ButtonStyle="ButtonStyle.Secondary" Click=@OpenOrder />*@
 
 
 <table class="table table-striped table-bordered table-sm">
@@ -82,12 +82,12 @@
 
 
     // RadzenDialog Demo
-    public int orderID = 12345;
+    //public int orderID = 12345;
 
-    public async Task OpenOrder()
-    {
-        await DialogService.OpenAsync<Clients>($"Order {orderID}", null, null);
-    }
+    //public async Task OpenOrder()
+    //{
+    //    await DialogService.OpenAsync<Clients>($"Order {orderID}", null, null);
+    //}
 
 
 }

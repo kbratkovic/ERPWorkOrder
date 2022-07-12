@@ -11,11 +11,11 @@ public class SparePartModel
 {
     public int Id { get; set; }
 
-    [Required]
+    [Required(ErrorMessage = "Šifra je obavezna")]
     [MaxLength(20)]
     public string Code { get; set; } = String.Empty;
 
-    [Required]
+    [Required(ErrorMessage = "Opis je obavezan")]
     [MaxLength(200)]
     public string Description { get; set; } = String.Empty;
 

@@ -27,12 +27,12 @@
 
         <div class="form-group row">
             <label>Količina</label>
-            <InputNumber @bind-Value="SparePart.Quantity" class="mb-4" />
+            <RadzenNumeric ShowUpDown="false" @bind-Value="SparePart.Quantity" class="mb-4" />
         </div>
 
         <div class="form-group row">
             <label>Cijena VPC</label>
-            <InputNumber @bind-Value="SparePart.PriceWithoutVAT" class="mb-4" />
+            <RadzenNumeric ShowUpDown="false" @bind-Value="SparePart.PriceWithoutVAT" class="mb-4" />
         </div>
 
         <RadzenButton type="submit" Text="Spremi" ButtonStyle="ButtonStyle.Secondary" />
@@ -46,6 +46,8 @@
 @code {
     string pageTitle = "";
     public ISparePartRepository Repository => Service;
+
+    string Quantity = string.Empty;
 
     [Parameter]
     public int Id { get; set; } = 0;
@@ -64,6 +66,9 @@
     {
         if (Id == 0)
         {
+            decimal tax = VAT.VATvalue;
+            SparePart.PriceWithVAT = (SparePart.PriceWithoutVAT * tax) + SparePart.PriceWithoutVAT;
+
             Repository.CreateSparePart(SparePart);
         }
         else

@@ -11,6 +11,7 @@
 <PageTitle>@pageTitle</PageTitle>
 
 <RadzenCard>
+    <h2 hidden="@isFormTitleHidden"><b>@SparePart.Code (@SparePart.Description)</b></h2>
     <EditForm Model="@SparePart" OnValidSubmit="SaveSparePart" class="w-100">
         <DataAnnotationsValidator />
         <ValidationSummary />
@@ -27,7 +28,7 @@
 
         <div class="form-group row">
             <label>Količina</label>
-            <RadzenNumeric ShowUpDown="false" @bind-Value="SparePart.Quantity" class="mb-4" />
+            <RadzenNumeric ShowUpDown="false" @bind-Value="SparePart.Quantity" class="mb-4" disabled="@isQuantityDisabled"/>
         </div>
 
         <div class="form-group row">
@@ -44,20 +45,26 @@
 </RadzenCard>
 
 @code {
-    string pageTitle = "";
     public ISparePartRepository Repository => Service;
-
-    string Quantity = string.Empty;
 
     [Parameter]
     public int Id { get; set; } = 0;
+
+    string pageTitle = "Novi rezervni dio";
+    public bool isQuantityDisabled = false;
+    public bool isFormTitleHidden = true;
 
 
     protected override void OnParametersSet()
     {
         SparePart = Repository.SpareParts.FirstOrDefault(sp => sp.Id == Id) ?? new();
 
-        pageTitle = (Id == 0) ? "Novi rezervni dio" : "Uredi rezervni dio";
+        if (Id != 0)
+        {
+            pageTitle = "Uredi rezervni dio";
+            isFormTitleHidden = false;
+            isQuantityDisabled = true;
+        } 
 
     }
 
@@ -66,9 +73,7 @@
     {
         if (Id == 0)
         {
-            decimal tax = VAT.VATvalue;
-            SparePart.PriceWithVAT = (SparePart.PriceWithoutVAT * tax) + SparePart.PriceWithoutVAT;
-
+            CalculatePriceWithVAT();
             Repository.CreateSparePart(SparePart);
         }
         else
@@ -79,11 +84,14 @@
     }
 
 
-    public string BackToSpareParts => $"/spareParts";
+    private string BackToSpareParts => $"/spareParts";
 
-    //private void BackToClients()
-    //{
-    //    NavigationManager.NavigateTo("/spareParts");
-    //}
+
+    private void CalculatePriceWithVAT()
+    {
+        decimal tax = VAT.VATvalue;
+        SparePart.PriceWithVAT = (SparePart.PriceWithoutVAT * tax) + SparePart.PriceWithoutVAT;
+    }
+
 
 }

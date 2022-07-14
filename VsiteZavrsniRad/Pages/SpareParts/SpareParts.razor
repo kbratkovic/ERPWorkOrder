@@ -9,46 +9,46 @@
 
 <PageTitle>Rezervni dijelovi</PageTitle>
 
-<NavLink href="@CreateNewSparePart" class="btn mb-4">
-    <RadzenButton Text="Novi rezervni dio" ButtonStyle="ButtonStyle.Secondary" />
-</NavLink>
-
 
 @*<RadzenButton Text="Open dialog" ButtonStyle="ButtonStyle.Secondary" Click=@OpenOrder />*@
 
 
-<table class="table table-striped table-bordered table-sm">
-    <thead>
-        <tr>
-            <th scope="col">Rb.</th>
-            <th scope="col">Šifra</th>
-            <th scope="col">Opis</th>
-            <th scope="col">Kličina</th>
-            <th scope="col">Cijena vpc</th>
-            <th scope="col">Cijena mpc</th>
-            <th scope="col"></th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (SparePartsData?.Count() > 0)
-        {
-            foreach (var sparePart in SparePartsData)
+<RadzenCard>
+    <NavLink href="@CreateNewSparePart" class="btn mb-4 btn-create">
+        <RadzenButton Text="Novi rezervni dio" ButtonStyle="ButtonStyle.Secondary" />
+    </NavLink>
+    <table class="table table-striped table-bordered table-sm">
+        <thead>
+            <tr>
+                <th scope="col">Rb.</th>
+                <th scope="col">Šifra</th>
+                <th scope="col">Opis</th>
+                <th scope="col">Kličina</th>
+                <th scope="col">Cijena vpc</th>
+                <th scope="col">Cijena mpc</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (SparePartsData?.Count() > 0)
             {
-                orderNumber++;
-                <tr>
-                    <td>@orderNumber</td>
-                    <td>@sparePart.Code</td>
-                    <td>@sparePart.Description</td>
-                    <td>@sparePart.Quantity</td>
-                    <td>@sparePart.PriceWithoutVAT</td>
-                    <td>@CalculatePriceWithVAT(sparePart.PriceWithoutVAT)</td>
-                    <td class="text-center"><NavLink class="btn btn-warning" href="@EditSparePart(sparePart.Id)">Uredi</NavLink></td>
-                </tr>
+                foreach (var sparePart in SparePartsData)
+                {
+                    orderNumber++;
+                    <tr>
+                        <td>@orderNumber</td>
+                        <td>@sparePart.Code</td>
+                        <td>@sparePart.Description</td>
+                        <td>@sparePart.Quantity</td>
+                        <td>@sparePart.PriceWithoutVAT</td>
+                        <td>@CalculatePriceWithVAT(sparePart.PriceWithoutVAT)</td>
+                        <td class="text-center"><NavLink class="btn btn-warning" href="@EditSparePart(sparePart.Id)">Uredi</NavLink></td>
+                    </tr>
+                }
             }
-        }
-    </tbody>
-</table>
-
+        </tbody>
+    </table>
+</RadzenCard>
 
 
 @code {
@@ -57,7 +57,7 @@
     private ISparePartRepository Repository => Service;
     public IEnumerable<SparePartModel> SparePartsData { get; set; } = Enumerable.Empty<SparePartModel>();
 
-    
+
     protected async override Task OnInitializedAsync()
     {
         orderNumber = 0;
@@ -72,7 +72,6 @@
 
 
     public string CreateNewSparePart => $"/sparePart/create";
-
     public string EditSparePart(int id) => $"/sparePart/edit/{id}";
 
 

@@ -8,5 +8,4 @@ public interface IClientRepository
 
     void CreateClient(ClientModel client);
     void SaveClient(ClientModel client);
-    void DeleteClient(ClientModel client);
 }

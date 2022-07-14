@@ -63,7 +63,7 @@
 
     protected override void OnParametersSet()
     {
-        //WorkOrder = Repository.WorkOrders.FirstOrDefault(c => c.Id == Id) ?? new();
+        WorkOrder = Repository.WorkOrders.FirstOrDefault(c => c.Id == Id) ?? new();
 
         pageTitle = (Id == 0) ? "Novi radni nalog" : "Uredi radni nalog";
 

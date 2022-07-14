@@ -21,10 +21,6 @@ public class ClientRepository : IClientRepository
         _dbContext.SaveChanges();
     }
 
-    public void DeleteClient(ClientModel client)
-    {
-        throw new NotImplementedException();
-    }
 
     public void SaveClient(ClientModel client)
     {

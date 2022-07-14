@@ -11,6 +11,7 @@
 <PageTitle>@pageTitle</PageTitle>
 
 <RadzenCard>
+    <h2 hidden="@isFormTitleHidden"><b>@Client.CompanyName</b></h2>
     <EditForm Model="@Client" OnValidSubmit="SaveClient" class="w-100">
         <DataAnnotationsValidator />
         <ValidationSummary />
@@ -55,18 +56,25 @@
 </RadzenCard>
 
 @code {
-    string pageTitle = "";
     public IClientRepository Repository => Service;
 
     [Parameter]
     public int Id { get; set; } = 0;
+
+    string pageTitle = "";
+    public bool isFormTitleHidden = true;
+
 
 
     protected override void OnParametersSet()
     {
         Client = Repository.Clients.FirstOrDefault(c => c.Id == Id) ?? new();
 
-        pageTitle = (Id == 0) ? "Novi klijent" : "Uredi klijenta";
+        if (Id != 0)
+        {
+            pageTitle = "Uredi klijenta";
+            isFormTitleHidden = false;
+        } 
 
     }
 
@@ -86,10 +94,5 @@
 
 
     public string BackToClients => $"/clients";
-
-    //private void BackToClients()
-    //{
-    //    NavigationManager.NavigateTo("/clients");
-    //}
 
 }

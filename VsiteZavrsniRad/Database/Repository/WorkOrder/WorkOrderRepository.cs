@@ -17,11 +17,12 @@ public class WorkOrderRepository : IWorkOrderRepository
 
     public void CreateWorkOrder(WorkOrderModel workOrder)
     {
-        throw new NotImplementedException();
+        _dbContext.Add(workOrder);
+        _dbContext.SaveChanges();
     }
 
     public void SaveWorkOrder(WorkOrderModel workOrder)
     {
-        throw new NotImplementedException();
+        _dbContext.SaveChanges();
     }
 }

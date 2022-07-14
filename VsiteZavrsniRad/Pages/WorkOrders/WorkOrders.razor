@@ -1,11 +1,11 @@
 ﻿@page "/"
 @page "/workOrders"
 
-@inject ClientModel Client;
+@inject WorkOrderModel WorkOrder;
 @inject DialogService DialogService
 @inject NavigationManager NavigationManager
 
-@inherits OwningComponentBase<IClientRepository>
+@inherits OwningComponentBase<IWorkOrderRepository>
 
 
 <PageTitle>Radni nalozi</PageTitle>
@@ -17,7 +17,7 @@
 
 @*<RadzenButton Text="Open dialog" ButtonStyle="ButtonStyle.Secondary" Click=@OpenOrder />*@
 
-@if (ClientData?.Count() > 0)
+@*@if (ClientData?.Count() > 0)
 {
     <RadzenDataList WrapItems="true" AllowPaging="true" Data="@ClientData" PageSize="5" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true">
         <Template Context="client">
@@ -41,97 +41,49 @@
                             <label class="mb-0">Adresa</label>
                             <p class="mb-sm-2 mb-lg-0">@(client.Address)</p>
                             </div>*@
-                                <div class="col-md-6 col-lg-5 mb-2">
+                               @* <div class="col-md-6 col-lg-5 mb-2">
                                     <b><label class="mb-0">Kontakt</label></b>
                                     <p class="mb-0 mb-lg-0">@(client.ContactPerson)</p>
                                     <p class="mb-sm-2 mb-lg-0">@(client.PhoneNumber)</p>
 
-                                </div>
+                                </div>*@
                                 @*<div class="col-md-6 col-lg-5 mb-2">
                             <label class="mb-0">Telefon</label>
                             <p class="mb-sm-2 mb-lg-0">@(client.PhoneNumber)</p>
                             </div>*@
-                            </div>
+                         @*   </div>
                         </div>
-                        <div class="col-lg-2 p-1">
+                        <div class="col-lg-2 p-1">*@
                             @*<button @onclick="EditClient" class="btn btn-warning w-50">Uredi</button>*@
-                            <NavLink class="btn btn-warning" href="@EditWorkOrder(client.Id)">Uredi</NavLink>
-                        </div>
+                            @*<NavLink class="btn btn-warning" href="@EditWorkOrder(client.Id)">Uredi</NavLink>*@
+                        @*</div>
                     </div>
                 </div>
             </RadzenCard>
-        </Template>
-    </RadzenDataList>
-}
+        </Template>*@
+    @*</RadzenDataList>*@
+@*}*@
 
 
 
 @code {
-    private IClientRepository Repository => Service;
+    private IWorkOrderRepository Repository => Service;
+    public IEnumerable<WorkOrderModel> WorkOrderData { get; set; } = Enumerable.Empty<WorkOrderModel>();
 
-    // promjeniti u IEnumerable i izbrisati dummy podatke
-    public List<ClientModel> ClientData { get; set; } = new List<ClientModel>()
+
+    protected async override Task OnInitializedAsync()
     {
-        new ClientModel
-        {
-            Id = 1,
-            CompanyName = "Makita",
-            TaxNumber = "6546546",
-            City = "Zagreb",
-            Address = "Zagrebacka 12",
-            ContactPerson = "Ivan Horvat",
-            PhoneNumber = "01 2564 221"
-        },
-
-        new ClientModel
-        {
-            Id = 2,
-            CompanyName = "Bosch",
-            TaxNumber = "6546546",
-            City = "Zagreb",
-            Address = "Zagrebacka 12",
-            ContactPerson = "Ivan Horvat",
-            PhoneNumber = "01 2564 221"
-        },
-
-        new ClientModel
-        {
-            Id = 3,
-            CompanyName = "Dewalt",
-            TaxNumber = "6546546",
-            City = "Zagreb",
-            Address = "Zagrebacka 12",
-            ContactPerson = "Ivan Horvat",
-            PhoneNumber = "01 2564 221"
-        },
-
-        new ClientModel
-        {
-            Id = 4,
-            CompanyName = "HILTI",
-            TaxNumber = "6546546",
-            City = "Zagreb",
-            Address = "Zagrebacka 12",
-            ContactPerson = "Ivan Horvat",
-            PhoneNumber = "01 2564 221"
-        }
-    };
+        await UpdateData();
+    }
 
 
-    //protected async override Task OnInitializedAsync()
-    //{
-    //    await UpdateData();
-    //}
-
-
-    //public async Task UpdateData()
-    //{
-    //    ClientData = await Repository.Clients.ToListAsync();
-    //}
+    public async Task UpdateData()
+    {
+        WorkOrderData = await Repository.WorkOrders.ToListAsync();
+    }
 
 
     public string CreateNewWorkOrder => $"/workOrder/create";
-
     public string EditWorkOrder(int id) => $"/workOrder/edit/{id}";
 
 

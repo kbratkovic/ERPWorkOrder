@@ -17,7 +17,10 @@ public class WorkOrderModel
 
     public ClientModel Client { get; set; } = new ClientModel();
 
-    [MaxLength(400)]
+    [Required(ErrorMessage = "Status naloga je obavezan")]
+    public string WorkOrderStatus { get; set; } = string.Empty;
+
+    [MaxLength(500)]
     public string WorkDescription { get; set; } = string.Empty;
 
     public List<SparePartModel> SpareParts { get; set; } = new List<SparePartModel>();

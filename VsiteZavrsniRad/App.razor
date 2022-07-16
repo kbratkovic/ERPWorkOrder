@@ -4,9 +4,9 @@
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
     </Found>
     <NotFound>
-        <PageTitle>Not found</PageTitle>
+        <PageTitle>Stranica ne postoji.</PageTitle>
         <LayoutView Layout="@typeof(MainLayout)">
-            <p role="alert">Sorry, there's nothing at this address.</p>
+            <p role="alert">Stranica koju ste tražili ne postoji. Vrati se na <a href="/">početnu stranicu.</a></p>
         </LayoutView>
     </NotFound>
 </Router>

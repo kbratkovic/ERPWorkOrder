@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VsiteZavrsniRad.Database;
 
@@ -11,9 +12,10 @@ using VsiteZavrsniRad.Database;
 namespace VsiteZavrsniRad.Migrations
 {
     [DbContext(typeof(ZavrsniRadDbContext))]
-    partial class ZavrsniRadDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220716203734_ChangeOrderStatusLength")]
+    partial class ChangeOrderStatusLength
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

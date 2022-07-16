@@ -1,94 +1,145 @@
 ﻿@page "/workOrder/create"
 @page "/workOrder/edit/{id:int}"
 
-
 @inject WorkOrderModel WorkOrder;
+@inject ClientModel Client;
 @inject NavigationManager NavigationManager;
+@inject DialogService DialogService
 
-@inherits OwningComponentBase<IWorkOrderRepository>
+@inherits OwningComponentBase
 
 
 <PageTitle>@pageTitle</PageTitle>
 
 <RadzenCard>
-@*    <EditForm Model="@WorkOrder" OnValidSubmit="SaveWorkOrder" class="w-100">
+    <EditForm Model="@WorkOrder" OnValidSubmit="SaveWorkOrder" class="w-100">
         <DataAnnotationsValidator />
         <ValidationSummary />
 
-        <div class="form-group row">
-            <label>Ime tvrtke</label>
-            <RadzenTextBox @bind-Value="Client.CompanyName" class="mb-4" />
+        <div class="form-group row mb-4">
+            <label>Broj Naloga</label>
+            <RadzenNumeric ShowUpDown="false" Value="@workOrderNumber" Disabled/>
         </div>
 
-        <div class="form-group row">
-            <label>OIB</label>
-            <RadzenTextBox @bind-Value="Client.TaxNumber" class="mb-4" />
+        <div class="form-group row mb-4">
+            <label>Datum</label>
+            <RadzenTextBox Value="@workOrderDate.ToShortDateString()"  Disabled></RadzenTextBox>
         </div>
 
-        <div class="form-group row">
-            <label>Grad</label>
-            <RadzenTextBox @bind-Value="Client.City" class="mb-4" />
+        <div class="form-group row mb-4">
+            <label>Klijent</label>
+            <div class="row">
+                <div class="col p-0">
+                    <RadzenTextBox class="w-100" Value="@Client.CompanyName" Disabled></RadzenTextBox>
+                </div>
+                <div class="col">
+                    <RadzenButton Text="..." ButtonStyle="ButtonStyle.Secondary" Click=@SelectClient />
+                </div>
+            </div>
         </div>
 
-        <div class="form-group row">
-            <label>Adresa</label>
-            <RadzenTextBox @bind-Value="Client.Address" class="mb-4" />
+        <div class="form-group row mb-4">
+            <label>Status naloga</label>
+            <RadzenDropDown AllowClear="true" TValue="string" Data=@WorkOrderStatus.WorkOrderStatusList @bind-Value="WorkOrder.WorkOrderStatus" Placeholder="Odaberi status..."/>
         </div>
 
-        <div class="form-group row">
-            <label>Kontakt osoba</label>
-            <RadzenTextBox @bind-Value="Client.ContactPerson" class="mb-4" />
+        <div class="form-group row mb-4">
+            <label>Opis posla</label>
+            <RadzenTextArea @bind-Value="WorkOrder.WorkDescription"></RadzenTextArea>
         </div>
 
-        <div class="form-group row">
-            <label>Kontakt telefon</label>
-            <RadzenTextBox @bind-Value="Client.PhoneNumber" class="mb-4" />
-        </div>
 
         <RadzenButton type="submit" Text="Spremi" ButtonStyle="ButtonStyle.Secondary" />
         
-        <NavLink href="@BackToClients">
+        <NavLink href="@BackToWorkOrders">
             <RadzenButton Text="Odustani" />
         </NavLink>
-    </EditForm>*@
+    </EditForm>
 </RadzenCard>
+
+
 
 @code {
     string pageTitle = "";
-    public IWorkOrderRepository Repository => Service;
+    private int workOrderNumber;
+    private DateTime workOrderDate;
+
+    public IWorkOrderRepository? WorkOrderRepo;
+    public IClientRepository? ClientRepo;
+
+    public IEnumerable<WorkOrderModel> WorkOrderData { get; set; } = Enumerable.Empty<WorkOrderModel>();
 
     [Parameter]
     public int Id { get; set; } = 0;
 
 
+    protected override void OnInitialized()
+    {
+        DialogService.OnClose += Close;
+
+        WorkOrderRepo = ScopedServices.GetService<IWorkOrderRepository>();
+        ClientRepo =  ScopedServices.GetService<IClientRepository>();
+
+        WorkOrderData = WorkOrderRepo.WorkOrders.ToList();
+        workOrderNumber = WorkOrderData.Count() + 1;
+
+        workOrderDate = DateTime.Now.Date;
+    }
+
+
     protected override void OnParametersSet()
     {
-        WorkOrder = Repository.WorkOrders.FirstOrDefault(c => c.Id == Id) ?? new();
+        WorkOrder = WorkOrderRepo.WorkOrders.FirstOrDefault(wo => wo.Id == Id) ?? new();
 
         pageTitle = (Id == 0) ? "Novi radni nalog" : "Uredi radni nalog";
-
     }
+
+
+    #region RadzenDialog
+    public void Dispose()
+    {
+        // The DialogService is a singleton so it is advisable to unsubscribe.
+        DialogService.OnClose -= Close;
+    }
+
+
+    void Close(dynamic result)
+    {
+        GetClientFromDialog(result);
+    }
+
+
+    private async Task GetClientFromDialog(int selectedClientId)
+    {
+        Client = await ClientRepo.Clients.FirstOrDefaultAsync(c => c.Id == selectedClientId) ?? new();
+        WorkOrder.Client = Client;
+        StateHasChanged();
+    }
+    #endregion RadzenDialog
 
 
     private void SaveWorkOrder()
     {
         if (Id == 0)
         {
-            Repository.CreateWorkOrder(WorkOrder);
+            WorkOrder.WorkOrderNumber = workOrderNumber;
+            WorkOrder.Date = workOrderDate;
+
+            WorkOrderRepo.CreateWorkOrder(WorkOrder);
         }
         else
         {
-            Repository.SaveWorkOrder(WorkOrder);
+            WorkOrderRepo.SaveWorkOrder(WorkOrder);
         }
-        NavigationManager.NavigateTo("workOrder");
+        NavigationManager.NavigateTo("workOrders");
     }
 
 
     public string BackToWorkOrders => $"/workOrders";
 
-    //private void BackToClients()
-    //{
-    //    NavigationManager.NavigateTo("/clients");
-    //}
 
+    public async Task SelectClient()
+    {
+        await DialogService.OpenAsync<SelectClientDialog>($"Odaberi klijenta", null, new DialogOptions() { Width="80vw", Height="80vh", Resizable = true });
+    }
 }

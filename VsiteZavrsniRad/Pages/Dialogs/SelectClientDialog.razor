@@ -1,0 +1,70 @@
+﻿@page "/selectClientDialog"
+
+@inject ClientModel Client;
+@inject DialogService DialogService
+@inject NavigationManager NavigationManager
+
+@inherits OwningComponentBase<IClientRepository>
+
+
+<PageTitle>Klijenti</PageTitle>
+
+<RadzenCard>
+    <table class="table table-striped table-bordered table-sm">
+        <thead>
+            <tr>
+                <th scope="col">Rb.</th>
+                <th scope="col">Tvrtka</th>
+                <th scope="col">OIB</th>
+                <th scope="col">Grad</th>
+                <th scope="col">Adresa</th>
+                <th scope="col">Kontakt</th>
+                <th scope="col">Telefon</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (ClientData?.Count() > 0)
+            {
+                foreach (var client in ClientData)
+                {
+                    orderNumber++;
+                    <tr>
+                        <td>@orderNumber</td>
+                        <td>@client.CompanyName</td>
+                        <td>@client.TaxNumber</td>
+                        <td>@client.City</td>
+                        <td>@client.Address</td>
+                        <td>@client.ContactPerson</td>
+                        <td>@client.PhoneNumber</td>
+                        <td class="text-center"><RadzenButton Click="@((args) => DialogService.Close(client.Id))" Text="Odaberi" /></td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</RadzenCard>
+
+
+
+@code {
+
+    private int orderNumber;
+    private IClientRepository Repository => Service;
+    public IEnumerable<ClientModel> ClientData { get; set; } = Enumerable.Empty<ClientModel>();
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        await UpdateData();
+        orderNumber = 0;
+
+    }
+
+
+    public async Task UpdateData()
+    {
+        ClientData = await Repository.Clients.ToListAsync();
+    }
+
+}

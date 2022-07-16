@@ -18,6 +18,7 @@ public class WorkOrderModel
     public ClientModel Client { get; set; } = new ClientModel();
 
     [Required(ErrorMessage = "Status naloga je obavezan")]
+    [MaxLength(50)]
     public string WorkOrderStatus { get; set; } = string.Empty;
 
     [MaxLength(500)]

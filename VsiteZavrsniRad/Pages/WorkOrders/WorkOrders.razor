@@ -5,48 +5,79 @@
 @inject DialogService DialogService
 @inject NavigationManager NavigationManager
 
-@inherits OwningComponentBase<IWorkOrderRepository>
+@inherits OwningComponentBase;
 
 
 <PageTitle>Radni nalozi</PageTitle>
 
-<NavLink href="@CreateNewWorkOrder" class="btn mb-4">
-    <RadzenButton Text="Novi radni nalog" ButtonStyle="ButtonStyle.Secondary" />
-</NavLink>
-
+<RadzenCard>
+    <NavLink href="@CreateNewWorkOrder" class="btn mb-4 btn-create">
+        <RadzenButton Text="Novi radni nalog" ButtonStyle="ButtonStyle.Secondary" />
+    </NavLink>
+    <table class="table table-striped table-bordered table-sm">
+        <thead>
+            <tr>
+                <th scope="col">Rb.</th>
+                <th scope="col">Br. naloga</th>
+                <th scope="col">Datum</th>
+                <th scope="col">Klijent</th>
+                <th scope="col">Status naloga</th>
+                <th scope="col">Cijena mpc</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (WorkOrderData?.Count() > 0)
+            {
+                foreach (var workOrder in WorkOrderData)
+                {
+                    orderNumber++;
+                    <tr class="align-middle">
+                        <td>@orderNumber</td>
+                        <td>@workOrder.WorkOrderNumber</td>
+                        <td>@workOrder.Date.ToShortDateString()</td>
+                        <td>@workOrder.Client.ClientName</td>
+                        <td>@workOrder.WorkOrderStatus</td>
+                        <td>890,00</td>
+                        <td class="text-center"><NavLink class="btn btn-warning" href="@EditWorkOrder(workOrder.Id)">Uredi</NavLink></td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</RadzenCard>
 
 
 
 
 @code {
-    private IWorkOrderRepository Repository => Service;
+
+    private int orderNumber;
+    private IClientRepository? ClientRepo;
+    private IWorkOrderRepository? WorkOrderRepo;
+    public IEnumerable<ClientModel> ClientData { get; set; } = Enumerable.Empty<ClientModel>();
     public IEnumerable<WorkOrderModel> WorkOrderData { get; set; } = Enumerable.Empty<WorkOrderModel>();
 
 
     protected async override Task OnInitializedAsync()
     {
+        orderNumber = 0;
+
+        ClientRepo = ScopedServices.GetService<IClientRepository>();
+        WorkOrderRepo = ScopedServices.GetService<IWorkOrderRepository>();
+
         await UpdateData();
     }
 
 
     public async Task UpdateData()
     {
-        WorkOrderData = await Repository.WorkOrders.ToListAsync();
+        ClientData = await ClientRepo.Clients.ToListAsync();
+        WorkOrderData = await WorkOrderRepo.WorkOrders.ToListAsync();
     }
 
 
     public string CreateNewWorkOrder => $"/workOrder/create";
-    public string EditWorkOrder(int id) => $"/workOrder/edit/{id}";
-
-
-
-    // RadzenDialog Demo
-    //public int orderID = 12345;
-
-    //public async Task OpenOrder()
-    //{
-    //    await DialogService.OpenAsync<Clients>($"Order {orderID}", null, null);
-    //}
-
+    public string EditWorkOrder(int Id) => $"/workOrder/edit/{Id}";
 
 }

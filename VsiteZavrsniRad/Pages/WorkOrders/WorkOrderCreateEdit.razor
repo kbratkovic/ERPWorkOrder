@@ -18,19 +18,19 @@
 
         <div class="form-group row mb-4">
             <label>Broj Naloga</label>
-            <RadzenNumeric ShowUpDown="false" Value="@workOrderNumber" Disabled/>
+            <RadzenNumeric ShowUpDown="false" Value="@WorkOrder.WorkOrderNumber" Disabled />
         </div>
 
         <div class="form-group row mb-4">
             <label>Datum</label>
-            <RadzenTextBox Value="@workOrderDate.ToShortDateString()"  Disabled></RadzenTextBox>
+            <RadzenTextBox Value="@workOrderDate.ToShortDateString()" Disabled></RadzenTextBox>
         </div>
 
         <div class="form-group row mb-4">
             <label>Klijent</label>
             <div class="row">
                 <div class="col p-0">
-                    <RadzenTextBox class="w-100" Value="@Client.CompanyName" Disabled></RadzenTextBox>
+                    <RadzenTextBox class="w-100" Value="@Client.ClientName" Disabled></RadzenTextBox>
                 </div>
                 <div class="col">
                     <RadzenButton Text="..." ButtonStyle="ButtonStyle.Secondary" Click=@SelectClient />
@@ -39,8 +39,13 @@
         </div>
 
         <div class="form-group row mb-4">
+            <label>Predmet servisa</label>
+            <RadzenTextArea @bind-Value="WorkOrder.ServiceItem"></RadzenTextArea>
+        </div>
+
+        <div class="form-group row mb-4">
             <label>Status naloga</label>
-            <RadzenDropDown AllowClear="true" TValue="string" Data=@WorkOrderStatus.WorkOrderStatusList @bind-Value="WorkOrder.WorkOrderStatus" Placeholder="Odaberi status..."/>
+            <RadzenDropDown AllowClear="true" TValue="string" Data=@WorkOrderStatus.WorkOrderStatusList @bind-Value="WorkOrder.WorkOrderStatus" Placeholder="Odaberi status..." />
         </div>
 
         <div class="form-group row mb-4">
@@ -50,7 +55,7 @@
 
 
         <RadzenButton type="submit" Text="Spremi" ButtonStyle="ButtonStyle.Secondary" />
-        
+
         <NavLink href="@BackToWorkOrders">
             <RadzenButton Text="Odustani" />
         </NavLink>
@@ -61,7 +66,7 @@
 
 @code {
     string pageTitle = "";
-    private int workOrderNumber;
+    private string workOrderNumber = "";
     private DateTime workOrderDate;
 
     public IWorkOrderRepository? WorkOrderRepo;
@@ -80,18 +85,35 @@
         WorkOrderRepo = ScopedServices.GetService<IWorkOrderRepository>();
         ClientRepo =  ScopedServices.GetService<IClientRepository>();
 
-        WorkOrderData = WorkOrderRepo.WorkOrders.ToList();
-        workOrderNumber = WorkOrderData.Count() + 1;
-
-        workOrderDate = DateTime.Now.Date;
     }
 
 
     protected override void OnParametersSet()
     {
         WorkOrder = WorkOrderRepo.WorkOrders.FirstOrDefault(wo => wo.Id == Id) ?? new();
+        Client = ClientRepo.Clients.FirstOrDefault(c => c.Id == WorkOrder.ClientId) ?? new();            
+
 
         pageTitle = (Id == 0) ? "Novi radni nalog" : "Uredi radni nalog";
+
+        if (Id == 0)
+        {
+            WorkOrderData = WorkOrderRepo.WorkOrders.ToList();
+            CreateWorkOrderNumber();
+        }
+        else
+        {
+            workOrderNumber = WorkOrder.WorkOrderNumber;
+            workOrderDate = WorkOrder.Date;
+        }
+    }
+
+
+    private void CreateWorkOrderNumber()
+    {
+        workOrderDate = DateTime.Now.Date;
+        workOrderNumber =  (WorkOrderData.Count() + 1).ToString() + "/" + workOrderDate.Year.ToString().Substring(2);
+        WorkOrder.WorkOrderNumber = workOrderNumber;
     }
 
 
@@ -105,15 +127,25 @@
 
     void Close(dynamic result)
     {
-        GetClientFromDialog(result);
+        if (result != null)
+        {
+            GetClientFromDialog(result);
+        }
     }
 
 
     private async Task GetClientFromDialog(int selectedClientId)
     {
-        Client = await ClientRepo.Clients.FirstOrDefaultAsync(c => c.Id == selectedClientId) ?? new();
+        Client = await ClientRepo.Clients.FirstOrDefaultAsync(c => c.Id == selectedClientId);
         WorkOrder.Client = Client;
+        WorkOrder.ClientId = Client.Id;
         StateHasChanged();
+    }
+
+
+    private async Task SelectClient()
+    {
+        await DialogService.OpenAsync<SelectClientDialog>($"Odaberi klijenta", null, new DialogOptions() { Width="80vw", Height="80vh", Resizable = true });
     }
     #endregion RadzenDialog
 
@@ -138,8 +170,5 @@
     public string BackToWorkOrders => $"/workOrders";
 
 
-    public async Task SelectClient()
-    {
-        await DialogService.OpenAsync<SelectClientDialog>($"Odaberi klijenta", null, new DialogOptions() { Width="80vw", Height="80vh", Resizable = true });
-    }
+
 }

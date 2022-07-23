@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VsiteZavrsniRad.Database;
 
@@ -11,9 +12,10 @@ using VsiteZavrsniRad.Database;
 namespace VsiteZavrsniRad.Migrations
 {
     [DbContext(typeof(ZavrsniRadDbContext))]
-    partial class ZavrsniRadDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220717131849_WOchanges")]
+    partial class WOchanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -40,14 +42,10 @@ namespace VsiteZavrsniRad.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("ClientName")
+                    b.Property<string>("CompanyName")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("ClientNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ContactPerson")
                         .IsRequired()
@@ -143,19 +141,13 @@ namespace VsiteZavrsniRad.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ServiceItem")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<string>("WorkDescription")
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<string>("WorkOrderNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("WorkOrderNumber")
+                        .HasColumnType("int");
 
                     b.Property<string>("WorkOrderStatus")
                         .IsRequired()

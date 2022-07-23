@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VsiteZavrsniRad.Database;
 
@@ -11,9 +12,10 @@ using VsiteZavrsniRad.Database;
 namespace VsiteZavrsniRad.Migrations
 {
     [DbContext(typeof(ZavrsniRadDbContext))]
-    partial class ZavrsniRadDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220717095809_dbChanges")]
+    partial class dbChanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -40,14 +42,10 @@ namespace VsiteZavrsniRad.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("ClientName")
+                    b.Property<string>("CompanyName")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("ClientNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ContactPerson")
                         .IsRequired()
@@ -67,29 +65,6 @@ namespace VsiteZavrsniRad.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Clients");
-                });
-
-            modelBuilder.Entity("VsiteZavrsniRad.Models.SparePart_WorkOrder", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("SparePartId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("WorkOrderId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SparePartId");
-
-                    b.HasIndex("WorkOrderId");
-
-                    b.ToTable("SparePart_WorkOrders");
                 });
 
             modelBuilder.Entity("VsiteZavrsniRad.Models.SparePartModel", b =>
@@ -124,6 +99,9 @@ namespace VsiteZavrsniRad.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
+                    b.Property<int>("WorkOrderId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("SpareParts");
@@ -143,19 +121,13 @@ namespace VsiteZavrsniRad.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ServiceItem")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<string>("WorkDescription")
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<string>("WorkOrderNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("WorkOrderNumber")
+                        .HasColumnType("int");
 
                     b.Property<string>("WorkOrderStatus")
                         .IsRequired()
@@ -164,54 +136,7 @@ namespace VsiteZavrsniRad.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ClientId");
-
                     b.ToTable("WorkOrders");
-                });
-
-            modelBuilder.Entity("VsiteZavrsniRad.Models.SparePart_WorkOrder", b =>
-                {
-                    b.HasOne("VsiteZavrsniRad.Models.SparePartModel", "SparePart")
-                        .WithMany("SparePart_WorkOrders")
-                        .HasForeignKey("SparePartId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("VsiteZavrsniRad.Models.WorkOrderModel", "WorkOrder")
-                        .WithMany("SparePart_WorkOrders")
-                        .HasForeignKey("WorkOrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("SparePart");
-
-                    b.Navigation("WorkOrder");
-                });
-
-            modelBuilder.Entity("VsiteZavrsniRad.Models.WorkOrderModel", b =>
-                {
-                    b.HasOne("VsiteZavrsniRad.Models.ClientModel", "Client")
-                        .WithMany("WorkOrders")
-                        .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Client");
-                });
-
-            modelBuilder.Entity("VsiteZavrsniRad.Models.ClientModel", b =>
-                {
-                    b.Navigation("WorkOrders");
-                });
-
-            modelBuilder.Entity("VsiteZavrsniRad.Models.SparePartModel", b =>
-                {
-                    b.Navigation("SparePart_WorkOrders");
-                });
-
-            modelBuilder.Entity("VsiteZavrsniRad.Models.WorkOrderModel", b =>
-                {
-                    b.Navigation("SparePart_WorkOrders");
                 });
 #pragma warning restore 612, 618
         }

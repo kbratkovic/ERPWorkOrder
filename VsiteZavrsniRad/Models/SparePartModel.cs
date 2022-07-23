@@ -19,12 +19,20 @@ public class SparePartModel
     [MaxLength(200)]
     public string Description { get; set; } = String.Empty;
 
-    [Required]
+    [Required(ErrorMessage = "Količina je obavezna")]
     public int Quantity { get; set; }
 
-    [Required]
+    [Required(ErrorMessage = "Mjera je obavezna")]
+    [MaxLength(10)]
+    public string UnitOfMeasure { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Veleprodajna cijena je obavezna")]
     public decimal PriceWithoutVAT { get; set; }
 
-    [Required]
+    [Required(ErrorMessage = "Maloprodajna cijena je obavezna")]
     public decimal PriceWithVAT { get; set; }
+
+
+    // Navigation Properties
+    public List<SparePart_WorkOrder> SparePart_WorkOrders { get; set; } = new List<SparePart_WorkOrder>();
 }

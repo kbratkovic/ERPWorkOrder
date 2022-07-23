@@ -9,10 +9,6 @@
 
 <PageTitle>Rezervni dijelovi</PageTitle>
 
-
-@*<RadzenButton Text="Open dialog" ButtonStyle="ButtonStyle.Secondary" Click=@OpenOrder />*@
-
-
 <RadzenCard>
     <NavLink href="@CreateNewSparePart" class="btn mb-4 btn-create">
         <RadzenButton Text="Novi rezervni dio" ButtonStyle="ButtonStyle.Secondary" />
@@ -23,7 +19,8 @@
                 <th scope="col">Rb.</th>
                 <th scope="col">Šifra</th>
                 <th scope="col">Opis</th>
-                <th scope="col">Kličina</th>
+                <th scope="col">Količina</th>
+                <th scope="col">Jed. mjere</th>
                 <th scope="col">Cijena vpc</th>
                 <th scope="col">Cijena mpc</th>
                 <th scope="col"></th>
@@ -40,6 +37,7 @@
                         <td>@sparePart.Code</td>
                         <td>@sparePart.Description</td>
                         <td>@sparePart.Quantity</td>
+                        <td>@sparePart.UnitOfMeasure</td>
                         <td>@sparePart.PriceWithoutVAT</td>
                         <td>@CalculatePriceWithVAT(sparePart.PriceWithoutVAT)</td>
                         <td class="text-center"><NavLink class="btn btn-warning" href="@EditSparePart(sparePart.Id)">Uredi</NavLink></td>
@@ -81,15 +79,6 @@
         decimal priceWithVAT = (price * tax) + price;
         return priceWithVAT.ToString("0.00");
     }
-
-
-    // RadzenDialog Demo
-    //public int orderID = 12345;
-
-    //public async Task OpenOrder()
-    //{
-    //    await DialogService.OpenAsync<Clients>($"Order {orderID}", null, null);
-    //}
 
 
 }

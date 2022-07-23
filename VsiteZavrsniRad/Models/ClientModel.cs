@@ -11,11 +11,12 @@ public class ClientModel
 {
     public int Id { get; set; }
 
+    public string ClientNumber { get; set; } = string.Empty;
+
     [Required(ErrorMessage = "Ime tvrtke je obavezno")]
     [MaxLength(100)]
-    public string CompanyName { get; set; } = String.Empty;
+    public string ClientName { get; set; } = String.Empty;
 
-    [Required(ErrorMessage = "OIB je obavezan")]
     [MaxLength(11)]
     public string TaxNumber { get; set; } = String.Empty;
 
@@ -32,4 +33,8 @@ public class ClientModel
 
     [MaxLength(25)]
     public string PhoneNumber { get; set; } = String.Empty;
+
+
+    // Navigation Properties
+    public List<WorkOrderModel> WorkOrders { get; set; } = new List<WorkOrderModel>();
 }

@@ -216,11 +216,13 @@
         {
             WorkOrder.WorkOrderNumber = workOrderNumber;
             WorkOrder.Date = workOrderDate;
+            Dispose();
 
             WorkOrderRepository.CreateWorkOrder(WorkOrder);
         }
         else
         {
+            Dispose();
             WorkOrderRepository.SaveWorkOrder(WorkOrder);
         }
         NavigationManager.NavigateTo("workOrders");

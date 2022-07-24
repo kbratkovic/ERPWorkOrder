@@ -83,6 +83,7 @@
         }
         else
         {
+            CalculatePriceWithVAT();
             Repository.SaveSparePart(SparePart);
         }
         NavigationManager.NavigateTo("spareParts");

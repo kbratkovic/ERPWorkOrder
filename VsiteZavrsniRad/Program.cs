@@ -18,6 +18,7 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<ClientModel>();
 builder.Services.AddScoped<SparePartModel>();
 builder.Services.AddScoped<WorkOrderModel>();
+builder.Services.AddScoped<SparePart_WorkOrder>();
 
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<ISparePartRepository, SparePartRepository>();

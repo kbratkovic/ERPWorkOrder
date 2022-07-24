@@ -3,6 +3,9 @@
 
 @inject WorkOrderModel WorkOrder;
 @inject ClientModel Client;
+@inject SparePartModel SparePart;
+@inject SparePart_WorkOrder SparePart_WorkOrder;
+
 @inject NavigationManager NavigationManager;
 @inject DialogService DialogService
 
@@ -53,6 +56,35 @@
             <RadzenTextArea @bind-Value="WorkOrder.WorkDescription"></RadzenTextArea>
         </div>
 
+        <div class="form-group row mb-4 mt-5">
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered table-sm">
+                    <thead>
+                        <tr class="text-center">
+                            <th scope="col" style="width:5%">Rb.</th>
+                            <th scope="col" style="width:15%">Šifra</th>
+                            <th scope="col" style="width:40%">Opis</th>
+                            <th scope="col" style="width:10%">Jed. mjere</th>
+                            <th scope="col" style="width:10%">Količina</th>
+                            <th scope="col" style="width:10%">Cijena vpc</th>
+                            <th scope="col" style="width:10%"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="align-middle">
+                            <td scope="row"><RadzenTextBox Value="1." Disabled Style="width:100%;"></RadzenTextBox></td>  
+                            <td><RadzenTextBox Style="width:100%"></RadzenTextBox></td>
+                            <td><RadzenTextBox Disabled Style="width:100%"></RadzenTextBox></td>
+                            <td><RadzenTextBox Disabled Style="width:100%"></RadzenTextBox></td>
+                            <td><RadzenTextBox Style="width:100%"></RadzenTextBox></td>
+                            <td><RadzenTextBox Style="width:100%"></RadzenTextBox></td>
+                            <td class="text-center"><RadzenButton Text="..." ButtonStyle="ButtonStyle.Secondary" Click=@SelecSparePart /></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
 
         <RadzenButton type="submit" Text="Spremi" ButtonStyle="ButtonStyle.Secondary" />
 
@@ -60,6 +92,7 @@
             <RadzenButton Text="Odustani" />
         </NavLink>
     </EditForm>
+
 </RadzenCard>
 
 
@@ -69,8 +102,9 @@
     private string workOrderNumber = "";
     private DateTime workOrderDate;
 
-    public IWorkOrderRepository? WorkOrderRepo;
-    public IClientRepository? ClientRepo;
+    public IWorkOrderRepository? WorkOrderRepository;
+    public IClientRepository? ClientRepository;
+    public ISparePartRepository? SparePartRepository;
 
     public IEnumerable<WorkOrderModel> WorkOrderData { get; set; } = Enumerable.Empty<WorkOrderModel>();
 
@@ -81,24 +115,27 @@
     protected override void OnInitialized()
     {
         DialogService.OnClose += Close;
+        //DialogSparePart.OnClose += CloseDialogSparePart;
 
-        WorkOrderRepo = ScopedServices.GetService<IWorkOrderRepository>();
-        ClientRepo =  ScopedServices.GetService<IClientRepository>();
-
+        WorkOrderRepository = ScopedServices.GetService<IWorkOrderRepository>();
+        ClientRepository =  ScopedServices.GetService<IClientRepository>();
+        SparePartRepository = ScopedServices.GetService<ISparePartRepository>();
     }
 
 
     protected override void OnParametersSet()
     {
-        WorkOrder = WorkOrderRepo.WorkOrders.FirstOrDefault(wo => wo.Id == Id) ?? new();
-        Client = ClientRepo.Clients.FirstOrDefault(c => c.Id == WorkOrder.ClientId) ?? new();            
+        WorkOrder = WorkOrderRepository.WorkOrders.FirstOrDefault(wo => wo.Id == Id) ?? new();
+        Client = ClientRepository.Clients.FirstOrDefault(c => c.Id == WorkOrder.ClientId) ?? new();            
 
 
         pageTitle = (Id == 0) ? "Novi radni nalog" : "Uredi radni nalog";
 
         if (Id == 0)
         {
-            WorkOrderData = WorkOrderRepo.WorkOrders.ToList();
+            WorkOrderData = WorkOrderRepository.WorkOrders.ToList();
+            SparePart_WorkOrder.WorkOrder = WorkOrder;
+            SparePart_WorkOrder.WorkOrderId = WorkOrder.Id;
             CreateWorkOrderNumber();
         }
         else
@@ -129,23 +166,46 @@
     {
         if (result != null)
         {
-            GetClientFromDialog(result);
+            if (result.GetType() == typeof(int))
+            {
+                GetClientFromDialog(result);
+            }
+            else
+            {
+                GetSparePartFromDialog(result);
+            }
         }
     }
 
 
     private async Task GetClientFromDialog(int selectedClientId)
     {
-        Client = await ClientRepo.Clients.FirstOrDefaultAsync(c => c.Id == selectedClientId);
+        Client = await ClientRepository.Clients.FirstOrDefaultAsync(c => c.Id == selectedClientId);
         WorkOrder.Client = Client;
         WorkOrder.ClientId = Client.Id;
         StateHasChanged();
     }
 
 
+    private async Task GetSparePartFromDialog(string selectedSparePartCode)
+    {
+        SparePart = await SparePartRepository.SpareParts.FirstOrDefaultAsync(sp => sp.Code == selectedSparePartCode);
+        SparePart_WorkOrder.SparePart = SparePart;
+        SparePart_WorkOrder.SparePartId = SparePart.Id;
+        WorkOrder.SparePart_WorkOrders.Add(SparePart_WorkOrder);
+        StateHasChanged();
+    }
+
+
     private async Task SelectClient()
     {
-        await DialogService.OpenAsync<SelectClientDialog>($"Odaberi klijenta", null, new DialogOptions() { Width="80vw", Height="80vh", Resizable = true });
+        await DialogService.OpenAsync<SelectClientDialog>($"Odaberi klijenta", null, new DialogOptions() { Width="80%", Height="50%", Resizable = false });
+    }
+
+
+    private async Task SelecSparePart()
+    {
+        await DialogService.OpenAsync<SelectSparePartDialog>($"Odaberi rezervni dio", null, new DialogOptions() { Width="80%", Height="50%", Resizable = false });
     }
     #endregion RadzenDialog
 
@@ -157,11 +217,11 @@
             WorkOrder.WorkOrderNumber = workOrderNumber;
             WorkOrder.Date = workOrderDate;
 
-            WorkOrderRepo.CreateWorkOrder(WorkOrder);
+            WorkOrderRepository.CreateWorkOrder(WorkOrder);
         }
         else
         {
-            WorkOrderRepo.SaveWorkOrder(WorkOrder);
+            WorkOrderRepository.SaveWorkOrder(WorkOrder);
         }
         NavigationManager.NavigateTo("workOrders");
     }

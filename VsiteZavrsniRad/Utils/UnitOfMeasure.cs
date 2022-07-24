@@ -2,5 +2,5 @@
 
 public static class UnitOfMeasure
 {
-    static public string[] UnitOfMeasureList { get; } = { "Komad", "Paket" };
+    static public string[] UnitOfMeasureList { get; } = { "Kom", "Par" };
 }

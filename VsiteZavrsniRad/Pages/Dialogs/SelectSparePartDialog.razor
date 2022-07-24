@@ -1,4 +1,4 @@
-﻿@page "/spareParts"
+﻿@page "/selectSparePartDialog"
 
 @inject SparePartModel SparePart;
 @inject DialogService DialogService
@@ -10,9 +10,6 @@
 <PageTitle>Rezervni dijelovi</PageTitle>
 
 <RadzenCard>
-    <NavLink href="@CreateNewSparePart" class="btn mb-4 btn-create">
-        <RadzenButton Text="Novi rezervni dio" ButtonStyle="ButtonStyle.Secondary" />
-    </NavLink>
     <table class="table table-striped table-bordered table-sm">
         <thead>
             <tr>
@@ -40,13 +37,14 @@
                         <td>@sparePart.UnitOfMeasure</td>
                         <td>@sparePart.PriceWithoutVAT</td>
                         <td>@sparePart.PriceWithVAT</td>
-                        <td class="text-center"><NavLink class="btn btn-warning" href="@EditSparePart(sparePart.Id)">Uredi</NavLink></td>
+                        <td class="text-center"><RadzenButton Click="@((args) => DialogService.Close(sparePart.Code))" Text="Odaberi" /></td>
                     </tr>
                 }
             }
         </tbody>
     </table>
 </RadzenCard>
+
 
 
 @code {
@@ -58,8 +56,9 @@
 
     protected async override Task OnInitializedAsync()
     {
-        orderNumber = 0;
         await UpdateData();
+        orderNumber = 0;
+
     }
 
 
@@ -68,7 +67,4 @@
         SparePartsData = await Repository.SpareParts.ToListAsync();
     }
 
-
-    public string CreateNewSparePart => $"/sparePart/create";
-    public string EditSparePart(int id) => $"/sparePart/edit/{id}";
 }

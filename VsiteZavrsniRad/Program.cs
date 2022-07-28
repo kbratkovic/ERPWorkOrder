@@ -6,6 +6,7 @@ using VsiteZavrsniRad.Database;
 using VsiteZavrsniRad.Database.Repository.Client;
 using VsiteZavrsniRad.Database.Repository.SparePart;
 using VsiteZavrsniRad.Database.Repository.WorkOrder;
+using VsiteZavrsniRad.Database.Repository.SparePart_WorkOrder;
 using VsiteZavrsniRad.Models;
 using VsiteZavrsniRad.Shared;
 
@@ -18,11 +19,12 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<ClientModel>();
 builder.Services.AddScoped<SparePartModel>();
 builder.Services.AddScoped<WorkOrderModel>();
-builder.Services.AddScoped<SparePart_WorkOrder>();
+builder.Services.AddScoped<SparePart_WorkOrderModel>();
 
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<ISparePartRepository, SparePartRepository>();
 builder.Services.AddScoped<IWorkOrderRepository, WorkOrderRepository>();
+builder.Services.AddScoped<ISparePart_WorkOrderRepository, SparePart_WorkOrderRepository>();
 
 builder.Services.AddDbContext<ZavrsniRadDbContext>(opts =>
 {

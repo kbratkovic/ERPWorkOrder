@@ -29,7 +29,7 @@ public class WorkOrderModel
     // Navigation Properties
     public int ClientId { get; set; }
     public ClientModel Client { get; set; } = new ClientModel();
-    public List<SparePart_WorkOrder> SparePart_WorkOrders { get; set; } = new List<SparePart_WorkOrder>();
+    public List<SparePart_WorkOrderModel> SparePart_WorkOrders { get; set; } = new List<SparePart_WorkOrderModel>();
 
 
 }

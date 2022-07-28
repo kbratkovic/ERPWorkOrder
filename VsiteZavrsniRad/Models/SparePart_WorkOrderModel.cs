@@ -1,6 +1,6 @@
 ﻿namespace VsiteZavrsniRad.Models;
 
-public class SparePart_WorkOrder
+public class SparePart_WorkOrderModel
 {
     public int Id { get; set; }
 

@@ -34,5 +34,5 @@ public class SparePartModel
 
 
     // Navigation Properties
-    public List<SparePart_WorkOrder> SparePart_WorkOrders { get; set; } = new List<SparePart_WorkOrder>();
+    public List<SparePart_WorkOrderModel> SparePart_WorkOrders { get; set; } = new List<SparePart_WorkOrderModel>();
 }

@@ -11,16 +11,16 @@ public class ZavrsniRadDbContext : DbContext
     public DbSet<ClientModel>? Clients { get; set; }
     public DbSet<SparePartModel>? SpareParts { get; set; }
     public DbSet<WorkOrderModel>? WorkOrders { get; set; }
-    public DbSet<SparePart_WorkOrder>? SparePart_WorkOrders { get; set; }
+    public DbSet<SparePart_WorkOrderModel>? SparePart_WorkOrders { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<SparePart_WorkOrder>()
+        modelBuilder.Entity<SparePart_WorkOrderModel>()
             .HasOne(s => s.SparePart)
             .WithMany(sw => sw.SparePart_WorkOrders)
             .HasForeignKey(si => si.SparePartId);
 
-        modelBuilder.Entity<SparePart_WorkOrder>()
+        modelBuilder.Entity<SparePart_WorkOrderModel>()
             .HasOne(w => w.WorkOrder)
             .WithMany(sw => sw.SparePart_WorkOrders)
             .HasForeignKey(si => si.WorkOrderId);

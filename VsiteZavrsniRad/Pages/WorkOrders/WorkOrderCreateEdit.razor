@@ -4,7 +4,7 @@
 @inject WorkOrderModel WorkOrder;
 @inject ClientModel Client;
 @inject SparePartModel SparePart;
-@inject SparePart_WorkOrder SparePart_WorkOrder;
+@inject SparePart_WorkOrderModel SparePart_WorkOrder;
 
 @inject NavigationManager NavigationManager;
 @inject DialogService DialogService
@@ -88,9 +88,7 @@
 
         <RadzenButton type="submit" Text="Spremi" ButtonStyle="ButtonStyle.Secondary" />
 
-        <NavLink href="@BackToWorkOrders">
-            <RadzenButton Text="Odustani" />
-        </NavLink>
+        <RadzenButton Text="Odustani" Click="@BackToWorkOrders"/>
     </EditForm>
 
 </RadzenCard>
@@ -114,8 +112,7 @@
 
     protected override void OnInitialized()
     {
-        DialogService.OnClose += Close;
-        //DialogSparePart.OnClose += CloseDialogSparePart;
+        DialogService.OnClose += CloseDialog;
 
         WorkOrderRepository = ScopedServices.GetService<IWorkOrderRepository>();
         ClientRepository =  ScopedServices.GetService<IClientRepository>();
@@ -155,14 +152,14 @@
 
 
     #region RadzenDialog
-    public void Dispose()
+    public void DisposeDialog()
     {
         // The DialogService is a singleton so it is advisable to unsubscribe.
-        DialogService.OnClose -= Close;
+        DialogService.OnClose -= CloseDialog;
     }
 
 
-    void Close(dynamic result)
+    void CloseDialog(dynamic result)
     {
         if (result != null)
         {
@@ -216,20 +213,24 @@
         {
             WorkOrder.WorkOrderNumber = workOrderNumber;
             WorkOrder.Date = workOrderDate;
-            Dispose();
+            DisposeDialog();
 
             WorkOrderRepository.CreateWorkOrder(WorkOrder);
         }
         else
         {
-            Dispose();
+            DisposeDialog();
             WorkOrderRepository.SaveWorkOrder(WorkOrder);
         }
         NavigationManager.NavigateTo("workOrders");
     }
 
 
-    public string BackToWorkOrders => $"/workOrders";
+    public void BackToWorkOrders()
+    {
+        DisposeDialog();
+        NavigationManager.NavigateTo("workOrders");
+    } 
 
 
 

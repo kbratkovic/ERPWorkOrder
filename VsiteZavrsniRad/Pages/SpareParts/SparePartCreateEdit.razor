@@ -95,8 +95,7 @@
 
     private void CalculatePriceWithVAT()
     {
-        decimal tax = VAT.VATvalue;
-        SparePart.PriceWithVAT = (SparePart.PriceWithoutVAT * tax) + SparePart.PriceWithoutVAT;
+        SparePart.PriceWithVAT = (SparePart.PriceWithoutVAT * VAT.VATvalue) + SparePart.PriceWithoutVAT;
     }
 
 

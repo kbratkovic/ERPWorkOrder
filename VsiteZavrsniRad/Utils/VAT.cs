@@ -1,6 +1,6 @@
 ﻿namespace VsiteZavrsniRad.Models;
 
-static public class VAT
+public static class VAT
 {
     static public decimal VATvalue { get; } = 0.25M;
 }

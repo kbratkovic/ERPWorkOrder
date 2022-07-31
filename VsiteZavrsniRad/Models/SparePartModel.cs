@@ -29,6 +29,8 @@ public class SparePartModel
     [Required(ErrorMessage = "Veleprodajna cijena je obavezna")]
     public decimal PriceWithoutVAT { get; set; }
 
+    public decimal quantityTimesPriceWithoutVAT { get; set; }
+
     [Required(ErrorMessage = "Maloprodajna cijena je obavezna")]
     public decimal PriceWithVAT { get; set; }
 

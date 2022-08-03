@@ -13,4 +13,15 @@ public class SparePart_WorkOrderRepository : ISparePart_WorkOrderRepository
 
     public IQueryable<SparePart_WorkOrderModel> SpareParts_WorkOrders => _dbContext.SparePart_WorkOrders;
 
+
+    public void DeleteSparePart_WorkOrder(SparePart_WorkOrderModel sparePart_workOrder)
+    {
+        _dbContext.Remove(sparePart_workOrder);
+        _dbContext.SaveChanges();
+    }
+
+    public void SaveSparePart_WorkOrder(SparePart_WorkOrderModel sparePart_workOrder)
+    {
+        _dbContext.SaveChanges();
+    }
 }

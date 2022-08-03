@@ -62,8 +62,8 @@
                     <thead>
                         <tr class="text-center">
                             <th scope="col" style="width:5%">Rb.</th>
-                            <th scope="col" style="width:15%">Šifra</th>
-                            <th scope="col" style="width:40%">Opis</th>
+                            <th scope="col" style="width:10%">Šifra</th>
+                            <th scope="col" style="width:25%">Opis</th>
                             <th scope="col" style="width:10%">Jed. mjere</th>
                             <th scope="col" style="width:10%">Količina</th>
                             <th scope="col" style="width:10%">Cijena vpc</th>
@@ -83,10 +83,13 @@
                                     <td><RadzenTextBox Value="@part.Code" Style="width:100%" ReadOnly></RadzenTextBox></td>
                                     <td><RadzenTextBox Value="@part.Description" Style="width:100%" ReadOnly></RadzenTextBox></td>
                                     <td><RadzenTextBox Value="@part.UnitOfMeasure" Style="width:100%" ReadOnly></RadzenTextBox></td>
-                                    <td><RadzenTextBox Value="@quantity.ToString()" @oninput=@(args => OnQntyEntered(args.Value.ToString(), part.PriceWithoutVAT.ToString(), part.Id.ToString())) Style="width:100%" ></RadzenTextBox></td>
-                                    <td><RadzenTextBox Value="@part.PriceWithoutVAT.ToString()" Style="width:100%"></RadzenTextBox></td>
+                                    <td><RadzenTextBox Value="@quantity.ToString()" @oninput=@(args => OnQntyEntered(args.Value.ToString(), part.PriceWithoutVAT.ToString(), part.Id.ToString())) Style="width:100%"></RadzenTextBox></td>
+                                    <td><RadzenTextBox Value="@part.PriceWithoutVAT.ToString()" Style="width:100%" ReadOnly></RadzenTextBox></td>
                                     <td><RadzenTextBox Value="@part.quantityTimesPriceWithoutVAT.ToString()" Style="width:100%" ReadOnly></RadzenTextBox></td>
-                                    <td class="text-center"><RadzenButton Text="..." ButtonStyle="ButtonStyle.Secondary" Click=@SelecSparePart /></td>
+                                    <td class="text-center">
+                                        <RadzenButton Text="..." ButtonStyle="ButtonStyle.Secondary" Click=@SelecSparePart disabled=@isAddBtnDisabled />
+                                        <RadzenButton Text="X" ButtonStyle="ButtonStyle.Danger" Click=@(args => DeleteSparePart(part.Id.ToString())) />
+                                    </td>
                                 </tr>
                             }
                         }
@@ -97,12 +100,12 @@
                         <tr class="align-middle">
                             <td><RadzenTextBox Style="width:100%" Value="@OrderNumberToString(orderNumber)" ReadOnly></RadzenTextBox></td>
                             <td><RadzenTextBox Style="width:100%" ReadOnly></RadzenTextBox></td>
-                            <td><RadzenTextBox Disabled Style="width:100%"></RadzenTextBox></td>
-                            <td><RadzenTextBox Disabled Style="width:100%"></RadzenTextBox></td>
-                            <td><RadzenTextBox Style="width:100%"></RadzenTextBox></td>
-                            <td><RadzenTextBox Style="width:100%"></RadzenTextBox></td>
-                            <td><RadzenTextBox Style="width:100%"></RadzenTextBox></td>
-                            <td class="text-center"><RadzenButton Text="..." ButtonStyle="ButtonStyle.Secondary" Click=@SelecSparePart /></td>
+                            <td><RadzenTextBox ReadOnly Style="width:100%"></RadzenTextBox></td>
+                            <td><RadzenTextBox ReadOnly Style="width:100%"></RadzenTextBox></td>
+                            <td><RadzenTextBox ReadOnly Style="width:100%"></RadzenTextBox></td>
+                            <td><RadzenTextBox ReadOnly Style="width:100%"></RadzenTextBox></td>
+                            <td><RadzenTextBox ReadOnly Style="width:100%"></RadzenTextBox></td>
+                            <td class="text-start"><RadzenButton Text="..." ButtonStyle="ButtonStyle.Secondary" Click=@SelecSparePart /></td>
                         </tr>
                     </tbody>
                 </table>
@@ -143,6 +146,7 @@
     private string stringOveralPriceWithoutVAT = "";
     private string stringOveralPriceWithVAT = "";
     private int quantity = 1;
+    private bool isAddBtnDisabled = true;
 
     public IWorkOrderRepository? WorkOrderRepository;
     public IClientRepository? ClientRepository;
@@ -238,6 +242,10 @@
             {
                 GetClientFromDialog(result);
             }
+            else if (result.GetType() == typeof(bool))
+            {
+                return;
+            }
             else
             {
                 GetSparePartFromDialog(result);
@@ -257,10 +265,23 @@
 
     private async Task GetSparePartFromDialog(string selectedSparePartCode)
     {
-        SparePart = await SparePartRepository.SpareParts.FirstOrDefaultAsync(sp => sp.Code == selectedSparePartCode);
+        SparePart = await SparePartRepository.SpareParts.FirstOrDefaultAsync(sp => sp.Code == selectedSparePartCode) ?? new();
+
+        if (SparePartsData.Contains(SparePart))
+        {
+            return;
+        }
+
         SparePart_WorkOrder.SparePart = SparePart;
         SparePart_WorkOrder.SparePartId = SparePart.Id;
         WorkOrder.SparePart_WorkOrders.Add(SparePart_WorkOrder);
+
+        SparePart_WorkOrderModel sp_wo = new SparePart_WorkOrderModel();
+        sp_wo.SparePartId = SparePart.Id;
+        sp_wo.WorkOrderId = WorkOrder.Id;
+
+        SparePart.SparePart_WorkOrders.Add(sp_wo);
+
         SparePartsData.Add(SparePart);
         if (SparePart.quantityTimesPriceWithoutVAT == 0)
         {
@@ -282,6 +303,46 @@
         await DialogService.OpenAsync<SelectSparePartDialog>($"Odaberi rezervni dio", null, new DialogOptions() { Width="80%", Height="50%", Resizable = false });
     }
     #endregion RadzenDialog
+
+
+    private async Task DeleteSparePart(string id)
+    {
+        int intId;
+
+        bool isIdParsable = Int32.TryParse(id, out intId);
+
+        if (isIdParsable)
+        {
+            var dialogResult = await DialogService.Confirm("Želite li stvarno obrisati rezervni dio?", "Obrisati rezervni dio?", new ConfirmOptions()
+                { OkButtonText = "Obriši", CancelButtonText = "Odustani" });
+
+            if (dialogResult.HasValue && dialogResult.Value)
+            {
+                try
+                {
+                    SparePartModel lstSparePart = SparePartsData.FirstOrDefault(sp => sp.Id == intId) ?? new();
+                    if (lstSparePart != null && lstSparePart.Id > 0)
+                    {
+                        SparePartsData.Remove(lstSparePart);
+
+                        SparePart_WorkOrderModel dbSparePart = SparePart_WorkOrderRepository.SpareParts_WorkOrders.FirstOrDefault(sp => sp.SparePartId == intId) ?? new();
+                        if (dbSparePart != null && dbSparePart.Id > 0)
+                        {
+                            SparePart_WorkOrderRepository.DeleteSparePart_WorkOrder(dbSparePart);
+                            StateHasChanged();
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                   
+                    
+                }
+            }
+
+
+        }
+    }
 
 
     private void SaveWorkOrder()
@@ -314,12 +375,6 @@
     {
         string stringOrderNumber = number.ToString() + ".";
         return stringOrderNumber;
-    }
-
-
-    private string CalculateQntTimesPrice(int quantity, decimal priceWithoutVAT)
-    {
-        return (quantity * priceWithoutVAT).ToString();
     }
 
 
@@ -365,16 +420,16 @@
 
     private void CalculateOveralPrice()
     {
-        decimal overalPriceWithoutVAT = 0M;;
+        decimal overalPriceWithoutVAT = 0M; ;
 
         foreach (var item in SparePartsData)
         {
             overalPriceWithoutVAT += item.quantityTimesPriceWithoutVAT;
         }
 
-        stringOveralPriceWithoutVAT = overalPriceWithoutVAT.ToString();
+        stringOveralPriceWithoutVAT = overalPriceWithoutVAT.ToString() + " kn";
 
         decimal overalPriceWithVAT = (overalPriceWithoutVAT * VAT.VATvalue) + overalPriceWithoutVAT;
-        stringOveralPriceWithVAT = overalPriceWithVAT.ToString("0.00");
+        stringOveralPriceWithVAT = overalPriceWithVAT.ToString("0.00") + " kn (mpc)";
     }
 }

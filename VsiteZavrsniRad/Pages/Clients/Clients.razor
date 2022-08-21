@@ -29,10 +29,12 @@
         <tbody>
             @if (ClientData?.Count() > 0)
             {
+                orderNumber = 0;
                 foreach (var client in ClientData)
                 {
+                    orderNumber++;
                     <tr class="align-middle">
-                        <td>@client.ClientNumber</td>
+                        <td>@orderNumber</td>
                         <td>@client.ClientName</td>
                         <td>@client.TaxNumber</td>
                         <td>@client.City</td>
@@ -50,6 +52,7 @@
 
 
 @code {
+    private int orderNumber;
 
     private IClientRepository Repository => Service;
     public IEnumerable<ClientModel> ClientData { get; set; } = Enumerable.Empty<ClientModel>();
@@ -57,6 +60,7 @@
 
     protected async override Task OnInitializedAsync()
     {
+        orderNumber = 1;
         await UpdateData();
     }
 

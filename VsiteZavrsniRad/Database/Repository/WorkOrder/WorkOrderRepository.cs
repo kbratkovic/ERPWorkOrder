@@ -11,9 +11,8 @@ public class WorkOrderRepository : IWorkOrderRepository
         _dbContext = dbContext;
     }
 
+
     public IQueryable<WorkOrderModel> WorkOrders => _dbContext.WorkOrders;
-
-
 
     public void CreateWorkOrder(WorkOrderModel workOrder)
     {

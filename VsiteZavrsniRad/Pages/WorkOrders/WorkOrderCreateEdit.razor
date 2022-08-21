@@ -1,5 +1,6 @@
 ﻿@page "/workOrder/create"
 @page "/workOrder/edit/{id:int}"
+@using System.Linq.Dynamic.Core
 
 @inject WorkOrderModel WorkOrder;
 @inject ClientModel Client;
@@ -33,7 +34,8 @@
             <label>Klijent</label>
             <div class="row">
                 <div class="col p-0">
-                    <RadzenTextBox class="w-100" Value="@Client.ClientName" ReadOnly></RadzenTextBox>
+                    @*<RadzenTextBox class="w-100" Value="@Client.ClientName" ReadOnly></RadzenTextBox>*@
+                    <RadzenTextBox class="w-100" Value="@WorkOrder.Client.ClientName" ReadOnly></RadzenTextBox>
                 </div>
                 <div class="col">
                     <RadzenButton Text="..." ButtonStyle="ButtonStyle.Secondary" Click=@SelectClient />
@@ -72,40 +74,46 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @if (SparePartsData.Count() > 0)
+                        @if (WorkOrdersDisplayData.Count() > 0)
                         {
                             orderNumber = 0;
-                            @foreach (var part in SparePartsData)
+                            @foreach (var part in WorkOrdersDisplayData)
                             {
+                                if (part.Quantity > 0)
+                                {                              
                                 orderNumber++;
+
                                 <tr class="align-middle">
                                     <td><RadzenTextBox Style="width:100%" Value="@OrderNumberToString(orderNumber)" ReadOnly></RadzenTextBox></td>
                                     <td><RadzenTextBox Value="@part.Code" Style="width:100%" ReadOnly></RadzenTextBox></td>
                                     <td><RadzenTextBox Value="@part.Description" Style="width:100%" ReadOnly></RadzenTextBox></td>
                                     <td><RadzenTextBox Value="@part.UnitOfMeasure" Style="width:100%" ReadOnly></RadzenTextBox></td>
-                                    <td><RadzenTextBox Value="@quantity.ToString()" @oninput=@(args => OnQntyEntered(args.Value.ToString(), part.PriceWithoutVAT.ToString(), part.Id.ToString())) Style="width:100%"></RadzenTextBox></td>
+                                    <td><RadzenTextBox Value="@part.Quantity.ToString()" @oninput=@(args => OnQntyEntered(args.Value.ToString(), part.PriceWithoutVAT.ToString(), part.SparePartId.ToString())) Style="width:100%"></RadzenTextBox></td>
+                                    @*<td><RadzenTextBox Value="@sparePartQuantity.ToString()" @oninput=@(args => OnQntyEntered(args.Value.ToString(), part.PriceWithoutVAT.ToString(), part.Id.ToString())) Style="width:100%"></RadzenTextBox></td>*@
                                     <td><RadzenTextBox Value="@part.PriceWithoutVAT.ToString()" Style="width:100%" ReadOnly></RadzenTextBox></td>
-                                    <td><RadzenTextBox Value="@part.quantityTimesPriceWithoutVAT.ToString()" Style="width:100%" ReadOnly></RadzenTextBox></td>
+                                    <td><RadzenTextBox Value="@part.TotalPriceWithoutVAT.ToString()" Style="width:100%" ReadOnly></RadzenTextBox></td>
                                     <td class="text-center">
-                                        <RadzenButton Text="..." ButtonStyle="ButtonStyle.Secondary" Click=@SelecSparePart disabled=@isAddBtnDisabled />
-                                        <RadzenButton Text="X" ButtonStyle="ButtonStyle.Danger" Click=@(args => DeleteSparePart(part.Id.ToString())) />
+                                        <RadzenButton Text="..." ButtonStyle="ButtonStyle.Secondary" Click=@SelecSparePart hidden=@isAddBtnHidden />
+                                        <RadzenButton Text="X" ButtonStyle="ButtonStyle.Danger" Click=@(args => DeleteSparePart(part.SparePartId.ToString())) />
                                     </td>
                                 </tr>
+                                }
                             }
                         }
-                        @if (SparePartsData.Count() > 0)
+                        @if (WorkOrdersDisplayData.Count() > 0)
                         {
-                            orderNumber = SparePartsData.Count() + 1;
+                            orderNumber = WorkOrdersDisplayData.Count() + 1;
                         }
                         <tr class="align-middle">
-                            <td><RadzenTextBox Style="width:100%" Value="@OrderNumberToString(orderNumber)" ReadOnly></RadzenTextBox></td>
+                            @*<td><RadzenTextBox Style="width:100%" Value="@OrderNumberToString(orderNumber)" ReadOnly></RadzenTextBox></td>*@
+                            <td><RadzenTextBox Style="width:100%" ReadOnly></RadzenTextBox></td>
                             <td><RadzenTextBox Style="width:100%" ReadOnly></RadzenTextBox></td>
                             <td><RadzenTextBox ReadOnly Style="width:100%"></RadzenTextBox></td>
                             <td><RadzenTextBox ReadOnly Style="width:100%"></RadzenTextBox></td>
                             <td><RadzenTextBox ReadOnly Style="width:100%"></RadzenTextBox></td>
                             <td><RadzenTextBox ReadOnly Style="width:100%"></RadzenTextBox></td>
                             <td><RadzenTextBox ReadOnly Style="width:100%"></RadzenTextBox></td>
-                            <td class="text-start"><RadzenButton Text="..." ButtonStyle="ButtonStyle.Secondary" Click=@SelecSparePart /></td>
+                            <td class="text-center"><RadzenButton Text="..." ButtonStyle="ButtonStyle.Secondary" Click=@SelecSparePart /></td>
                         </tr>
                     </tbody>
                 </table>
@@ -119,7 +127,7 @@
                             <td><RadzenTextBox ReadOnly Value="@stringOveralPriceWithoutVAT" Style="width:100%"></RadzenTextBox></td>
                         </tr>
                         <tr class="align-middle">
-                            <td class="table-dark"><RadzenTextBox ReadOnly Value="Ukupna cijena:" Style="width:100%"></RadzenTextBox></td>
+                            <td class="table-dark"><RadzenTextBox ReadOnly Value="Ukupna cijena (mpc):" Style="width:100%"></RadzenTextBox></td>
                             <td class="table-dark"><RadzenTextBox ReadOnly Value="@stringOveralPriceWithVAT" Style="width:100%"></RadzenTextBox></td>
                         </tr>
                     </tbody>
@@ -145,8 +153,8 @@
     private DateTime workOrderDate;
     private string stringOveralPriceWithoutVAT = "";
     private string stringOveralPriceWithVAT = "";
-    private int quantity = 1;
-    private bool isAddBtnDisabled = true;
+    private int sparePartQuantity = 1;
+    private bool isAddBtnHidden = true;
 
     public IWorkOrderRepository? WorkOrderRepository;
     public IClientRepository? ClientRepository;
@@ -156,6 +164,7 @@
     public IEnumerable<WorkOrderModel> WorkOrderData { get; set; } = Enumerable.Empty<WorkOrderModel>();
     public IEnumerable<SparePart_WorkOrderModel> SparePart_WorkOrderData { get; set; } = Enumerable.Empty<SparePart_WorkOrderModel>();
     public List<SparePartModel> SparePartsData { get; set; } = new List<SparePartModel>();
+    public List<SparePart_WorkOrderModel> WorkOrdersDisplayData { get; set; } = new List<SparePart_WorkOrderModel>();
 
 
 
@@ -178,42 +187,32 @@
 
     protected override void OnParametersSet()
     {
-        WorkOrder = WorkOrderRepository.WorkOrders.FirstOrDefault(wo => wo.Id == Id) ?? new();
-        Client = ClientRepository.Clients.FirstOrDefault(c => c.Id == WorkOrder.ClientId) ?? new();
-        SparePart_WorkOrderData = SparePart_WorkOrderRepository.SpareParts_WorkOrders.Where(sp => sp.WorkOrderId == Id).ToList() ?? new();
-        GetSparePartsForWorkOrder();
+        if (WorkOrderRepository != null && ClientRepository != null && SparePart_WorkOrderRepository != null)
+        {
+            WorkOrder = WorkOrderRepository.WorkOrders.FirstOrDefault(wo => wo.Id == Id) ?? new();
+            Client = ClientRepository.Clients.FirstOrDefault(c => c.Id == WorkOrder.ClientId) ?? new();
+            SparePart_WorkOrderData = SparePart_WorkOrderRepository.SpareParts_WorkOrders.Where(sp => sp.WorkOrderId == Id).ToList() ?? new();
+
+            // kad se pokrene app ako ima dijelova u nalogu ucitaj ih u ovu listu
+            WorkOrdersDisplayData = SparePart_WorkOrderRepository.SpareParts_WorkOrders.Where(sp => sp.WorkOrderId == Id).ToList();
+        }
+
         CalculateOveralPrice();
 
         pageTitle = (Id == 0) ? "Novi radni nalog" : "Uredi radni nalog";
 
         if (Id == 0)
         {
-            WorkOrderData = WorkOrderRepository.WorkOrders.ToList();
-            SparePart_WorkOrder.WorkOrder = WorkOrder;
-            SparePart_WorkOrder.WorkOrderId = WorkOrder.Id;
-            CreateWorkOrderNumber();
+            if (WorkOrderRepository != null)
+            {
+                WorkOrderData = WorkOrderRepository.WorkOrders.ToList();
+                CreateWorkOrderNumber();
+            }
         }
         else
         {
             workOrderNumber = WorkOrder.WorkOrderNumber;
             workOrderDate = WorkOrder.Date;
-        }
-    }
-
-
-    private void GetSparePartsForWorkOrder()
-    {
-        foreach (var item in SparePart_WorkOrderData)
-        {
-            SparePartsData.Add(SparePartRepository.SpareParts.FirstOrDefault(sp => sp.Id == item.SparePartId));
-        }
-
-        foreach (var item in SparePartsData)
-        {
-            if (item.quantityTimesPriceWithoutVAT == 0)
-            {
-                item.quantityTimesPriceWithoutVAT = item.PriceWithoutVAT;
-            }
         }
     }
 
@@ -256,37 +255,63 @@
 
     private async Task GetClientFromDialog(int selectedClientId)
     {
-        Client = await ClientRepository.Clients.FirstOrDefaultAsync(c => c.Id == selectedClientId);
-        WorkOrder.Client = Client;
-        WorkOrder.ClientId = Client.Id;
-        StateHasChanged();
+        if (ClientRepository != null)
+        {
+            Client = await ClientRepository.Clients.FirstOrDefaultAsync(c => c.Id == selectedClientId);
+
+            if (Client != null)
+            {
+                WorkOrder.Client = Client;
+                WorkOrder.ClientId = Client.Id;
+            }
+
+            StateHasChanged();
+        }
     }
 
 
     private async Task GetSparePartFromDialog(string selectedSparePartCode)
     {
-        SparePart = await SparePartRepository.SpareParts.FirstOrDefaultAsync(sp => sp.Code == selectedSparePartCode) ?? new();
-
-        if (SparePartsData.Contains(SparePart))
+        if (SparePartRepository != null)
         {
-            return;
+            SparePart = await SparePartRepository.SpareParts.FirstOrDefaultAsync(sp => sp.Code == selectedSparePartCode) ?? new();
+
+            foreach (var item in WorkOrdersDisplayData)
+            {
+                if (item.SparePartId == SparePart.Id && item.Quantity > 0)
+                {
+                    return;
+                }
+                else if (item.SparePartId == SparePart.Id && item.Quantity == 0) 
+                {
+                    item.Quantity = 1;
+                    item.PriceWithoutVAT = SparePart.PriceWithoutVAT;
+                    item.PriceWithVAT = SparePart.PriceWithVAT;
+                    item.TotalPriceWithoutVAT = 1 * SparePart.PriceWithoutVAT;
+                    CalculateOveralPrice();
+                    StateHasChanged();
+                    return;
+                }
+            }
+
+
+            SparePart_WorkOrderModel spwo = new SparePart_WorkOrderModel();
+            spwo.SparePartId = SparePart.Id;
+            spwo.Code = SparePart.Code;
+            spwo.Description = SparePart.Description;
+            spwo.Quantity = sparePartQuantity;
+            spwo.UnitOfMeasure = SparePart.UnitOfMeasure;
+            spwo.PriceWithoutVAT = SparePart.PriceWithoutVAT;
+            spwo.PriceWithVAT = SparePart.PriceWithVAT;
+            spwo.TotalPriceWithoutVAT = sparePartQuantity * SparePart.PriceWithoutVAT;
+
+            WorkOrder.SparePart_WorkOrders.Add(spwo);
+            WorkOrdersDisplayData.Add(spwo);
+
+            SparePart.Quantity -= sparePartQuantity;
+            SparePartsData.Add(SparePart);
         }
 
-        SparePart_WorkOrder.SparePart = SparePart;
-        SparePart_WorkOrder.SparePartId = SparePart.Id;
-        WorkOrder.SparePart_WorkOrders.Add(SparePart_WorkOrder);
-
-        SparePart_WorkOrderModel sp_wo = new SparePart_WorkOrderModel();
-        sp_wo.SparePartId = SparePart.Id;
-        sp_wo.WorkOrderId = WorkOrder.Id;
-
-        SparePart.SparePart_WorkOrders.Add(sp_wo);
-
-        SparePartsData.Add(SparePart);
-        if (SparePart.quantityTimesPriceWithoutVAT == 0)
-        {
-            SparePart.quantityTimesPriceWithoutVAT = 1 * SparePart.PriceWithoutVAT;
-        }
         CalculateOveralPrice();
         StateHasChanged();
     }
@@ -301,6 +326,16 @@
     private async Task SelecSparePart()
     {
         await DialogService.OpenAsync<SelectSparePartDialog>($"Odaberi rezervni dio", null, new DialogOptions() { Width="80%", Height="50%", Resizable = false });
+    }
+
+
+    private void ShowClientMandatoryDialog()
+    {
+        DialogService.Open("Odabir klijenta je obavezan!", ds =>
+    @<div>
+        Klikni izvan okvira za zatvaranje.
+        </div>
+    , new DialogOptions() { CloseDialogOnOverlayClick = true });
     }
     #endregion RadzenDialog
 
@@ -320,27 +355,29 @@
             {
                 try
                 {
-                    SparePartModel lstSparePart = SparePartsData.FirstOrDefault(sp => sp.Id == intId) ?? new();
-                    if (lstSparePart != null && lstSparePart.Id > 0)
-                    {
-                        SparePartsData.Remove(lstSparePart);
+                    SparePart_WorkOrderModel spwoFromList = WorkOrdersDisplayData.FirstOrDefault(spwo => spwo.SparePartId == intId) ?? new();
 
-                        SparePart_WorkOrderModel dbSparePart = SparePart_WorkOrderRepository.SpareParts_WorkOrders.FirstOrDefault(sp => sp.SparePartId == intId) ?? new();
-                        if (dbSparePart != null && dbSparePart.Id > 0)
+                    if (spwoFromList != null)
+                    {
+                        foreach (var item in WorkOrdersDisplayData)
                         {
-                            SparePart_WorkOrderRepository.DeleteSparePart_WorkOrder(dbSparePart);
+                            if (spwoFromList.Code == item.Code)
+                            {
+                                item.Quantity = 0;
+                                item.PriceWithoutVAT = 0.0M;
+                                item.PriceWithVAT = 0.0M;
+                                item.TotalPriceWithoutVAT = 0.0M;
+                            }
+                            CalculateOveralPrice();
                             StateHasChanged();
                         }
                     }
                 }
                 catch (Exception e)
                 {
-                   
                     
                 }
             }
-
-
         }
     }
 
@@ -351,20 +388,47 @@
         {
             WorkOrder.WorkOrderNumber = workOrderNumber;
             WorkOrder.Date = workOrderDate;
-            DisposeDialog();
 
-            WorkOrderRepository.CreateWorkOrder(WorkOrder);
+            if (WorkOrderRepository != null && WorkOrder.ClientId != 0)
+            {
+                DisposeDialog();
+                WorkOrderRepository.CreateWorkOrder(WorkOrder);
+
+                SaveSparePartQuantity();
+            }
+            else
+            {
+                ShowClientMandatoryDialog();
+                return;
+            }
         }
         else
         {
-            DisposeDialog();
-            WorkOrderRepository.SaveWorkOrder(WorkOrder);
+            if (WorkOrderRepository != null)
+            {
+                DisposeDialog();
+                WorkOrderRepository.SaveWorkOrder(WorkOrder);
+
+                SaveSparePartQuantity();
+            }
         }
         NavigationManager.NavigateTo("workOrders");
     }
 
 
-    public void BackToWorkOrders()
+    private void SaveSparePartQuantity()
+    {
+        if (SparePartRepository != null && SparePartsData.Count() > 0)
+        {
+            foreach (var item in SparePartsData)
+            {
+                SparePartRepository.SaveSparePart(SparePart);
+            }
+        }
+    }
+
+
+    private void BackToWorkOrders()
     {
         DisposeDialog();
         NavigationManager.NavigateTo("workOrders");
@@ -393,6 +457,7 @@
 
         if (isQntyParsable && isPriceParsable && isIntParsable)
         {
+            sparePartQuantity = qnty;
             parseQnty = qnty;
             parsePrice = price;
             parseId = outId;
@@ -405,16 +470,25 @@
 
     private void UpdateSparePartFinalPrice(int id, decimal finalPrice)
     {
-        SparePartModel sparePart = SparePartsData.FirstOrDefault(sp => sp.Id == id) ?? new();
+        foreach (var item in WorkOrdersDisplayData)
+        {
+            if (item.SparePartId == id)
+            {
+                item.Quantity = sparePartQuantity;
+                item.TotalPriceWithoutVAT = finalPrice;
+            }
+        }
+
+        CalculateOveralPrice();
 
         foreach (var item in SparePartsData)
         {
-            if (sparePart.Id == item.Id)
+            if (item.Id == id)
             {
-                item.quantityTimesPriceWithoutVAT = finalPrice;
+                item.Quantity += 1;
+                item.Quantity -= sparePartQuantity;
             }
         }
-        CalculateOveralPrice();
     }
 
 
@@ -422,14 +496,19 @@
     {
         decimal overalPriceWithoutVAT = 0M; ;
 
-        foreach (var item in SparePartsData)
+        foreach (var item in WorkOrdersDisplayData)
         {
-            overalPriceWithoutVAT += item.quantityTimesPriceWithoutVAT;
+            if (item.Quantity > 0)
+            {
+                overalPriceWithoutVAT += item.TotalPriceWithoutVAT;
+            }
         }
 
         stringOveralPriceWithoutVAT = overalPriceWithoutVAT.ToString() + " kn";
 
         decimal overalPriceWithVAT = (overalPriceWithoutVAT * VAT.VATvalue) + overalPriceWithoutVAT;
-        stringOveralPriceWithVAT = overalPriceWithVAT.ToString("0.00") + " kn (mpc)";
+        stringOveralPriceWithVAT = overalPriceWithVAT.ToString("0.00") + " kn";
+
+        WorkOrder.TotalpriceWithoutVAT = overalPriceWithoutVAT;
     }
 }

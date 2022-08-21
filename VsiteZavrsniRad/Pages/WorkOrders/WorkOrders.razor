@@ -22,7 +22,8 @@
                 <th scope="col">Datum</th>
                 <th scope="col">Klijent</th>
                 <th scope="col">Status naloga</th>
-                <th scope="col">Cijena mpc</th>
+                <th scope="col">Cijena vpc (kn)</th>
+                <th scope="col">Cijena mpc (kn)</th>
                 <th scope="col"></th>
             </tr>
         </thead>
@@ -38,7 +39,8 @@
                         <td>@workOrder.Date.ToShortDateString()</td>
                         <td>@workOrder.Client.ClientName</td>
                         <td>@workOrder.WorkOrderStatus</td>
-                        <td>890,00</td>
+                        <td>@workOrder.TotalpriceWithoutVAT</td>
+                        <td>@CalculatePriceWithVAT(@workOrder.TotalpriceWithoutVAT)</td>
                         <td class="text-center"><NavLink class="btn btn-warning" href="@EditWorkOrder(workOrder.Id)">Uredi</NavLink></td>
                     </tr>
                 }
@@ -72,12 +74,22 @@
 
     public async Task UpdateData()
     {
-        ClientData = await ClientRepo.Clients.ToListAsync();
-        WorkOrderData = await WorkOrderRepo.WorkOrders.ToListAsync();
+        if (ClientRepo != null && WorkOrderRepo != null)
+        {
+            ClientData = await ClientRepo.Clients.ToListAsync();
+            WorkOrderData = await WorkOrderRepo.WorkOrders.ToListAsync();            
+        }
     }
 
 
     public string CreateNewWorkOrder => $"/workOrder/create";
     public string EditWorkOrder(int Id) => $"/workOrder/edit/{Id}";
+
+
+    private string CalculatePriceWithVAT(decimal price) 
+    {
+        decimal priceWithVAT = (price * VAT.VATvalue) + price;
+        return priceWithVAT.ToString("0.00");
+    }
 
 }

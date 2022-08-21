@@ -24,5 +24,29 @@ public class ZavrsniRadDbContext : DbContext
             .HasOne(w => w.WorkOrder)
             .WithMany(sw => sw.SparePart_WorkOrders)
             .HasForeignKey(si => si.WorkOrderId);
+
+        modelBuilder.Entity<SparePartModel>()
+            .Property(p => p.PriceWithoutVAT)
+            .HasColumnType("decimal(18,2)");
+
+        modelBuilder.Entity<SparePartModel>()
+            .Property(p => p.PriceWithVAT)
+            .HasColumnType("decimal(18,2)");
+
+        modelBuilder.Entity<WorkOrderModel>()
+            .Property(w => w.TotalpriceWithoutVAT)
+            .HasColumnType("decimal(18,2)");
+
+        modelBuilder.Entity<SparePart_WorkOrderModel>()
+            .Property(sw => sw.PriceWithoutVAT)
+            .HasColumnType("decimal(18,2)");
+
+        modelBuilder.Entity<SparePart_WorkOrderModel>()
+            .Property(sw => sw.PriceWithVAT)
+            .HasColumnType("decimal(18,2)");
+
+        modelBuilder.Entity<SparePart_WorkOrderModel>()
+            .Property(sw => sw.TotalPriceWithoutVAT)
+            .HasColumnType("decimal(18,2)");
     }
 }

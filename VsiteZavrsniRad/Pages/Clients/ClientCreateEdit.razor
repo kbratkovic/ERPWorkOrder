@@ -72,8 +72,6 @@
         Client = Repository.Clients.FirstOrDefault(c => c.Id == Id) ?? new();
         ClientData = Repository.Clients.ToList();
 
-        Client.ClientNumber = (ClientData.Count() + 1).ToString();
-
         if (Id != 0)
         {
             pageTitle = "Uredi klijenta";

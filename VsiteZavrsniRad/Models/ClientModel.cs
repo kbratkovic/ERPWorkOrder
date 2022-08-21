@@ -11,28 +11,24 @@ public class ClientModel
 {
     public int Id { get; set; }
 
-    public string ClientNumber { get; set; } = string.Empty;
-
-    [Required(ErrorMessage = "Ime tvrtke je obavezno")]
+    [Required(ErrorMessage = "Odabir klijenta je obavezan")]
     [MaxLength(100)]
-    public string ClientName { get; set; } = String.Empty;
+    public string ClientName { get; set; } = string.Empty;
 
     [MaxLength(11)]
-    public string TaxNumber { get; set; } = String.Empty;
+    public string TaxNumber { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Grad je obavezan")]
     [MaxLength(50)]
-    public string City { get; set; } = String.Empty;
+    public string City { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Adresa je obavezna")]
     [MaxLength(200)]
-    public string Address { get; set; } = String.Empty;
+    public string Address { get; set; } = string.Empty;
 
     [MaxLength(60)]
-    public string ContactPerson { get; set; } = String.Empty;
+    public string ContactPerson { get; set; } = string.Empty;
 
     [MaxLength(25)]
-    public string PhoneNumber { get; set; } = String.Empty;
+    public string PhoneNumber { get; set; } = string.Empty;
 
 
     // Navigation Properties

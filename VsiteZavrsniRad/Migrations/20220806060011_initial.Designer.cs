@@ -12,8 +12,8 @@ using VsiteZavrsniRad.Database;
 namespace VsiteZavrsniRad.Migrations
 {
     [DbContext(typeof(ZavrsniRadDbContext))]
-    [Migration("20220716203734_ChangeOrderStatusLength")]
-    partial class ChangeOrderStatusLength
+    [Migration("20220806060011_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -42,7 +42,7 @@ namespace VsiteZavrsniRad.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("CompanyName")
+                    b.Property<string>("ClientName")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -65,6 +65,53 @@ namespace VsiteZavrsniRad.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Clients");
+                });
+
+            modelBuilder.Entity("VsiteZavrsniRad.Models.SparePart_WorkOrderModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("PriceWithVAT")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("PriceWithoutVAT")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SparePartId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalPriceWithoutVAT")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("UnitOfMeasure")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("WorkOrderId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SparePartId");
+
+                    b.HasIndex("WorkOrderId");
+
+                    b.ToTable("SparePart_WorkOrders");
                 });
 
             modelBuilder.Entity("VsiteZavrsniRad.Models.SparePartModel", b =>
@@ -94,12 +141,12 @@ namespace VsiteZavrsniRad.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<int?>("WorkOrderModelId")
-                        .HasColumnType("int");
+                    b.Property<string>("UnitOfMeasure")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("WorkOrderModelId");
 
                     b.ToTable("SpareParts");
                 });
@@ -118,13 +165,22 @@ namespace VsiteZavrsniRad.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("ServiceItem")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal>("TotalpriceWithoutVAT")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("WorkDescription")
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<int>("WorkOrderNumber")
-                        .HasColumnType("int");
+                    b.Property<string>("WorkOrderNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("WorkOrderStatus")
                         .IsRequired()
@@ -138,17 +194,29 @@ namespace VsiteZavrsniRad.Migrations
                     b.ToTable("WorkOrders");
                 });
 
-            modelBuilder.Entity("VsiteZavrsniRad.Models.SparePartModel", b =>
+            modelBuilder.Entity("VsiteZavrsniRad.Models.SparePart_WorkOrderModel", b =>
                 {
-                    b.HasOne("VsiteZavrsniRad.Models.WorkOrderModel", null)
-                        .WithMany("SpareParts")
-                        .HasForeignKey("WorkOrderModelId");
+                    b.HasOne("VsiteZavrsniRad.Models.SparePartModel", "SparePart")
+                        .WithMany("SparePart_WorkOrders")
+                        .HasForeignKey("SparePartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("VsiteZavrsniRad.Models.WorkOrderModel", "WorkOrder")
+                        .WithMany("SparePart_WorkOrders")
+                        .HasForeignKey("WorkOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SparePart");
+
+                    b.Navigation("WorkOrder");
                 });
 
             modelBuilder.Entity("VsiteZavrsniRad.Models.WorkOrderModel", b =>
                 {
                     b.HasOne("VsiteZavrsniRad.Models.ClientModel", "Client")
-                        .WithMany()
+                        .WithMany("WorkOrders")
                         .HasForeignKey("ClientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -156,9 +224,19 @@ namespace VsiteZavrsniRad.Migrations
                     b.Navigation("Client");
                 });
 
+            modelBuilder.Entity("VsiteZavrsniRad.Models.ClientModel", b =>
+                {
+                    b.Navigation("WorkOrders");
+                });
+
+            modelBuilder.Entity("VsiteZavrsniRad.Models.SparePartModel", b =>
+                {
+                    b.Navigation("SparePart_WorkOrders");
+                });
+
             modelBuilder.Entity("VsiteZavrsniRad.Models.WorkOrderModel", b =>
                 {
-                    b.Navigation("SpareParts");
+                    b.Navigation("SparePart_WorkOrders");
                 });
 #pragma warning restore 612, 618
         }

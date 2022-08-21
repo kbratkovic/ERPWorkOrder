@@ -45,10 +45,6 @@ namespace VsiteZavrsniRad.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("ClientNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ContactPerson")
                         .IsRequired()
                         .HasMaxLength(60)
@@ -77,8 +73,32 @@ namespace VsiteZavrsniRad.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("PriceWithVAT")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("PriceWithoutVAT")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
                     b.Property<int>("SparePartId")
                         .HasColumnType("int");
+
+                    b.Property<decimal>("TotalPriceWithoutVAT")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("UnitOfMeasure")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("WorkOrderId")
                         .HasColumnType("int");
@@ -124,9 +144,6 @@ namespace VsiteZavrsniRad.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
-                    b.Property<decimal>("quantityTimesPriceWithoutVAT")
-                        .HasColumnType("decimal(18,2)");
-
                     b.HasKey("Id");
 
                     b.ToTable("SpareParts");
@@ -150,6 +167,9 @@ namespace VsiteZavrsniRad.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal>("TotalpriceWithoutVAT")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("WorkDescription")
                         .IsRequired()

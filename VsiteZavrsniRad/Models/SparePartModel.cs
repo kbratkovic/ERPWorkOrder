@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,11 +14,11 @@ public class SparePartModel
 
     [Required(ErrorMessage = "Šifra je obavezna")]
     [MaxLength(20)]
-    public string Code { get; set; } = String.Empty;
+    public string Code { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Opis je obavezan")]
     [MaxLength(200)]
-    public string Description { get; set; } = String.Empty;
+    public string Description { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Količina je obavezna")]
     public int Quantity { get; set; }
@@ -26,12 +27,11 @@ public class SparePartModel
     [MaxLength(10)]
     public string UnitOfMeasure { get; set; } = string.Empty;
 
+    [Column(TypeName = "decimal(18,2)")]
     [Required(ErrorMessage = "Veleprodajna cijena je obavezna")]
     public decimal PriceWithoutVAT { get; set; }
 
-    public decimal quantityTimesPriceWithoutVAT { get; set; }
-
-
+    [Column(TypeName = "decimal(18,2)")]
     public decimal PriceWithVAT { get; set; }
 
 

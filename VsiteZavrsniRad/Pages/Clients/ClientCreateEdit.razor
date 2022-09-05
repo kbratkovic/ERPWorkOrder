@@ -23,7 +23,8 @@
 
         <div class="form-group row">
             <label>OIB</label>
-            <RadzenTextBox @bind-Value="Client.TaxNumber" class="mb-4" />
+            <p hidden="@isOibWarningHidden" style="color:red">Postoji klijent sa istim OIB-om</p>
+            <RadzenTextBox @bind-Value="Client.TaxNumber" class="mb-4" @oninput=@(args => CheckIfClientExists(args.Value.ToString()))/>
         </div>
 
         <div class="form-group row">
@@ -64,6 +65,7 @@
 
     string pageTitle = "";
     public bool isFormTitleHidden = true;
+    public bool isOibWarningHidden = true;
 
 
 
@@ -85,16 +87,45 @@
     {
         if (Id == 0)
         {
-            Repository.CreateClient(Client);
+            if (isOibWarningHidden)
+            {
+                Repository.CreateClient(Client);
+                NavigationManager.NavigateTo("clients");
+            }
         }
         else
         {
-            Repository.SaveClient(Client);
+            if (isOibWarningHidden) 
+            {
+                Repository.SaveClient(Client);
+                NavigationManager.NavigateTo("clients");
+            }
         }
-        NavigationManager.NavigateTo("clients");
     }
 
 
     public string BackToClients => $"/clients";
+
+
+    private void CheckIfClientExists(string input)
+    {
+        ClientModel client = new ClientModel();
+        if (Repository != null)
+        {
+            client = Repository.Clients.FirstOrDefault(c => c.TaxNumber == input.Trim()) ?? new();
+
+            if (client.TaxNumber != "")
+            {
+                if (Client.Id != client.Id)
+                {
+                    isOibWarningHidden = false;                
+                }
+            }
+            else 
+            {
+                isOibWarningHidden = true;
+            }
+        }
+    }
 
 }

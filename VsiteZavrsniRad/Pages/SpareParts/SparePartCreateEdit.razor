@@ -18,7 +18,8 @@
 
         <div class="form-group row">
             <label>Šifra</label>
-            <RadzenTextBox @bind-Value="SparePart.Code" class="mb-4" />
+            <p hidden="@isCodeWarningHidden" style="color:red">Postoji rezervni dio sa istom šifrom</p>
+            <RadzenTextBox @bind-Value="SparePart.Code" class="mb-4" @oninput=@(args => CheckIfSparePartExists(args.Value.ToString())) />
         </div>
 
         <div class="form-group row">
@@ -58,6 +59,7 @@
     string pageTitle = "Novi rezervni dio";
     public bool isQuantityDisabled = false;
     public bool isFormTitleHidden = true;
+    public bool isCodeWarningHidden = true;
 
 
     protected override void OnParametersSet()
@@ -78,15 +80,22 @@
     {
         if (Id == 0)
         {
-            CalculatePriceWithVAT();
-            Repository.CreateSparePart(SparePart);
+            if (isCodeWarningHidden)
+            {
+                CalculatePriceWithVAT();
+                Repository.CreateSparePart(SparePart);
+                NavigationManager.NavigateTo("spareParts");
+            }
         }
         else
         {
-            CalculatePriceWithVAT();
-            Repository.SaveSparePart(SparePart);
-        }
+            if (isCodeWarningHidden)
+            {
+                CalculatePriceWithVAT();
         NavigationManager.NavigateTo("spareParts");
+                Repository.SaveSparePart(SparePart);
+            }
+        }
     }
 
 
@@ -99,4 +108,24 @@
     }
 
 
+    private void CheckIfSparePartExists(string input)
+    {
+        SparePartModel sparePart = new SparePartModel();
+        if (Repository != null)
+        {
+            sparePart = Repository.SpareParts.FirstOrDefault(s => s.Code == input.Trim()) ?? new();
+
+            if (sparePart.Code != "")
+            {
+                if (SparePart.Id != sparePart.Id)
+                {
+                    isCodeWarningHidden = false;
+                }
+            }
+            else
+            {
+                isCodeWarningHidden = true;
+            }
+        }
+    }
 }

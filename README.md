@@ -1,4 +1,4 @@
-# VsiteZavrsniRad-RadniNalozi
+# ERPWorkOrder
 This is Blazor Server App that I made during college. Basic idea behind it is to learn how can I make forms and store and retreive data using Entity Framework Core. 
 App is simulating bussiness ERP software for service shops where user can store and update client, spare parts and work order data.
 
